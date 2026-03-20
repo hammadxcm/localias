@@ -1,11 +1,13 @@
 {
   "name": "localias",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "bin": {
     "localias": "./dist/cli.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "./dist/cli.js",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
