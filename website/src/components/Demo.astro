@@ -1,0 +1,341 @@
+---
+import Terminal from './Terminal.astro';
+
+const demos = {
+  basic: [
+    {
+      title: 'Run a Dev Server',
+      termTitle: 'localias run',
+      lines: [
+        { type: 'prompt', text: '$ localias run -- npm run dev' },
+        { type: 'output', text: 'framework: vite' },
+        { type: 'output', text: 'port: 3291' },
+        { type: 'success', text: 'ready at http://myapp.localhost:1355' },
+      ],
+    },
+    {
+      title: 'List Routes',
+      termTitle: 'localias list',
+      lines: [
+        { type: 'prompt', text: '$ localias list' },
+        { type: 'output', text: 'HOSTNAME                PORT   STATUS' },
+        { type: 'success', text: 'myapp.localhost:1355    3291   running' },
+        { type: 'success', text: 'api.localhost:1355      4102   running' },
+        { type: 'output', text: '2 routes registered' },
+      ],
+    },
+    {
+      title: 'Named Mode',
+      termTitle: 'localias run --name',
+      lines: [
+        { type: 'prompt', text: '$ localias run --name api -- node server.js' },
+        { type: 'output', text: 'name: api' },
+        { type: 'output', text: 'port: 4102' },
+        { type: 'success', text: 'ready at http://api.localhost:1355' },
+      ],
+    },
+  ],
+  docker: [
+    {
+      title: 'Docker Compose Up',
+      termTitle: 'localias compose',
+      lines: [
+        { type: 'prompt', text: '$ localias compose -- docker compose up' },
+        { type: 'output', text: 'parsing docker-compose.yml...' },
+        { type: 'output', text: 'discovered 3 services' },
+        { type: 'success', text: 'web  → web.myapp.localhost:1355  (:3291)' },
+        { type: 'success', text: 'api  → api.myapp.localhost:1355  (:4102)' },
+        { type: 'success', text: 'docs → docs.myapp.localhost:1355 (:5500)' },
+      ],
+    },
+    {
+      title: 'Custom Compose File',
+      termTitle: 'localias compose -f',
+      lines: [
+        { type: 'prompt', text: '$ localias compose -- docker compose -f dev.yml up' },
+        { type: 'output', text: 'parsing dev.yml...' },
+        { type: 'success', text: 'web  → web.myapp.localhost:1355  (:3291)' },
+        { type: 'success', text: 'api  → api.myapp.localhost:1355  (:4102)' },
+        { type: 'output', text: '2 services ready' },
+      ],
+    },
+    {
+      title: 'Injected Env Vars',
+      termTitle: 'env vars',
+      lines: [
+        { type: 'output', text: '# Auto-injected per service:' },
+        { type: 'success', text: 'WEB_PORT=3291' },
+        { type: 'success', text: 'WEB_PORT_0=3291' },
+        { type: 'success', text: 'API_PORT=4102' },
+        { type: 'success', text: 'API_PORT_0=4102' },
+        { type: 'success', text: 'DOCS_PORT=5500' },
+      ],
+    },
+    {
+      title: 'Multi-Port Service',
+      termTitle: 'multi-port',
+      lines: [
+        { type: 'output', text: '# Service "api" exposes 2 ports:' },
+        { type: 'success', text: 'api.myapp.localhost:1355   → :4102' },
+        { type: 'success', text: '1.api.myapp.localhost:1355 → :4103' },
+        { type: 'output', text: '' },
+        { type: 'output', text: 'API_PORT_0=4102  API_PORT_1=4103' },
+      ],
+    },
+    {
+      title: 'Named Project + Force',
+      termTitle: 'localias compose --name',
+      lines: [
+        { type: 'prompt', text: '$ localias compose --name shop --force \\' },
+        { type: 'prompt', text: '    -- docker compose up' },
+        { type: 'output', text: 'project: shop (forced)' },
+        { type: 'success', text: 'web.shop.localhost:1355  (:3291)' },
+        { type: 'success', text: 'api.shop.localhost:1355  (:4102)' },
+      ],
+    },
+  ],
+  tls: [
+    {
+      title: 'Trust Certificates',
+      termTitle: 'localias trust',
+      lines: [
+        { type: 'prompt', text: '$ localias trust' },
+        { type: 'output', text: 'generating CA certificate...' },
+        { type: 'success', text: 'CA added to system keychain' },
+        { type: 'success', text: 'browsers will trust *.localhost' },
+      ],
+    },
+    {
+      title: 'HTTPS Mode',
+      termTitle: 'localias proxy start --https',
+      lines: [
+        { type: 'prompt', text: '$ localias proxy start --https' },
+        { type: 'success', text: 'TLS enabled' },
+        { type: 'output', text: 'proxy listening on :1355' },
+        { type: 'success', text: 'https://myapp.localhost:1355' },
+      ],
+    },
+  ],
+  advanced: [
+    {
+      title: 'Custom Alias',
+      termTitle: 'localias alias',
+      lines: [
+        { type: 'prompt', text: '$ localias alias set dashboard myapp' },
+        { type: 'success', text: 'alias: dashboard.localhost → myapp' },
+        { type: 'prompt', text: '$ localias alias list' },
+        { type: 'output', text: 'dashboard → myapp' },
+      ],
+    },
+    {
+      title: 'Get Route Info',
+      termTitle: 'localias get',
+      lines: [
+        { type: 'prompt', text: '$ localias get myapp' },
+        { type: 'output', text: 'hostname: myapp.localhost:1355' },
+        { type: 'output', text: 'port:     3291' },
+        { type: 'output', text: 'pid:      48291' },
+        { type: 'success', text: 'status:   running' },
+      ],
+    },
+    {
+      title: 'Hosts Sync',
+      termTitle: 'localias hosts',
+      lines: [
+        { type: 'prompt', text: '$ localias hosts sync' },
+        { type: 'output', text: 'syncing 3 routes to /etc/hosts' },
+        { type: 'success', text: '127.0.0.1 myapp.localhost' },
+        { type: 'success', text: '127.0.0.1 api.localhost' },
+        { type: 'success', text: '127.0.0.1 docs.localhost' },
+      ],
+    },
+  ],
+};
+
+const typeClassMap: Record<string, string> = {
+  prompt: 'terminal-prompt',
+  output: 'terminal-output',
+  success: 'terminal-success',
+  warning: 'terminal-warning',
+  error: 'terminal-error',
+};
+
+const tabs = [
+  { id: 'basic', label: 'Basic', color: 'var(--green)' },
+  { id: 'docker', label: 'Docker', color: 'var(--yellow)' },
+  { id: 'tls', label: 'TLS', color: 'var(--cyan)' },
+  { id: 'advanced', label: 'Advanced', color: 'var(--red)' },
+];
+---
+
+<section class="section" id="demos">
+  <div class="container">
+    <h2 class="section-title reveal">See It In <span class="gradient-text">Action</span></h2>
+    <p class="section-subtitle reveal">Real commands, real output.</p>
+
+    <div class="demo-tabs reveal" role="tablist" aria-label="Demo categories">
+      {tabs.map((tab, i) => (
+        <button
+          role="tab"
+          id={`tab-${tab.id}`}
+          class={`demo-tab-btn ${i === 0 ? 'active' : ''}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          aria-controls={`tabpanel-${tab.id}`}
+          tabindex={i === 0 ? 0 : -1}
+          style={`--tab-color: ${tab.color}`}
+          type="button"
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+
+    {Object.entries(demos).map(([key, demoList], tabIdx) => (
+      <div
+        class={`demo-tab-content ${tabIdx === 0 ? 'active' : ''}`}
+        data-tab={key}
+        role="tabpanel"
+        id={`tabpanel-${key}`}
+        aria-labelledby={`tab-${key}`}
+        tabindex="0"
+      >
+        {demoList.map((demo, i) => (
+          <div class="demo-item reveal" style={`--delay: ${i * 0.1}s`}>
+            <h3 class="demo-label">{demo.title}</h3>
+            <Terminal title={demo.termTitle}>
+              {demo.lines.map((line) => (
+                <div class="terminal-line">
+                  <span class={typeClassMap[line.type]}>{line.text}</span>
+                </div>
+              ))}
+            </Terminal>
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .demo-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 32px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .demo-tab-btn {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.2s, border-color 0.2s;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    background: none;
+    font-family: var(--font-sans);
+  }
+
+  .demo-tab-btn:hover {
+    color: var(--text);
+  }
+
+  .demo-tab-btn.active {
+    color: var(--tab-color, var(--red));
+    border-bottom-color: var(--tab-color, var(--red));
+  }
+
+  .demo-tab-content {
+    display: none;
+  }
+
+  .demo-tab-content.active {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .demo-item {
+    transition-delay: var(--delay);
+  }
+
+  .demo-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 768px) {
+    .demo-tabs {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .demo-tab-btn {
+      padding: 10px 16px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .demo-tab-content.active {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const demosSection = document.getElementById('demos')!;
+  const tablist = demosSection.querySelector('[role="tablist"]');
+  const tabs = Array.from(demosSection.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+  const panels = demosSection.querySelectorAll<HTMLElement>('[role="tabpanel"]');
+
+  function activateTab(tab: HTMLButtonElement) {
+    tabs.forEach((t) => {
+      t.setAttribute('aria-selected', 'false');
+      t.tabIndex = -1;
+      t.classList.remove('active');
+    });
+    tab.setAttribute('aria-selected', 'true');
+    tab.tabIndex = 0;
+    tab.classList.add('active');
+    tab.focus();
+
+    const targetId = tab.getAttribute('aria-controls');
+    panels.forEach((panel) => {
+      panel.classList.toggle('active', panel.id === targetId);
+    });
+
+    // Re-trigger reveal for newly visible items
+    document.querySelectorAll('.demo-tab-content.active .reveal:not(.visible)').forEach((el) => {
+      el.classList.add('visible');
+    });
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => activateTab(tab));
+  });
+
+  tablist?.addEventListener('keydown', (e) => {
+    const event = e as KeyboardEvent;
+    const current = tabs.indexOf(document.activeElement as HTMLButtonElement);
+    let next: number | null = null;
+
+    if (event.key === 'ArrowRight') next = (current + 1) % tabs.length;
+    else if (event.key === 'ArrowLeft') next = (current - 1 + tabs.length) % tabs.length;
+    else if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = tabs.length - 1;
+
+    if (next !== null) {
+      event.preventDefault();
+      activateTab(tabs[next]);
+    }
+  });
+</script>

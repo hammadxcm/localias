@@ -70,3 +70,11 @@ export class ConfigValidationError extends Error {
 		this.name = 'ConfigValidationError'
 	}
 }
+
+export class ComposeParseError extends Error {
+	readonly code = 'COMPOSE_PARSE' as const
+	constructor(readonly detail: string) {
+		super(`Failed to parse compose file: ${detail}`)
+		this.name = 'ComposeParseError'
+	}
+}

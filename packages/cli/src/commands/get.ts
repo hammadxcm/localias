@@ -1,11 +1,11 @@
-import type { Container } from '@publify/infra'
-import { isErr } from '@publify/core'
+import { isErr } from '@localias/core'
+import type { Container } from '@localias/infra'
 import type { ArgParser } from '../parser.js'
 
 export async function getCommand(parser: ArgParser, container: Container): Promise<void> {
 	const name = parser.positional()
 
-	const result = await container.getServiceUrl.execute(name)
+	const result = await container.getServiceUrl.execute(name, process.cwd())
 	if (isErr(result)) {
 		console.error(`Error: ${result.error.message}`)
 		process.exitCode = 1
@@ -13,5 +13,5 @@ export async function getCommand(parser: ArgParser, container: Container): Promi
 	}
 
 	// Output URL to stdout (for use in scripts/env vars)
-	process.stdout.write(result.value + '\n')
+	process.stdout.write(`${result.value}\n`)
 }

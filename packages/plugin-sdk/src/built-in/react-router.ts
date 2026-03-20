@@ -5,15 +5,16 @@ export const reactRouterPlugin = definePlugin({
 	strictPort: true,
 	detect: (ctx) => ctx.command === 'react-router',
 	injectFlags: (args, port) => {
-		if (!args.some((a) => a === '--port')) {
-			args.push('--port', String(port))
+		const result = [...args]
+		if (!result.some((a) => a === '--port' || a.startsWith('--port='))) {
+			result.push('--port', String(port))
 		}
-		if (!args.some((a) => a === '--strictPort')) {
-			args.push('--strictPort')
+		if (!result.some((a) => a === '--strictPort' || a.startsWith('--strictPort='))) {
+			result.push('--strictPort')
 		}
-		if (!args.some((a) => a === '--host')) {
-			args.push('--host', '127.0.0.1')
+		if (!result.some((a) => a === '--host' || a.startsWith('--host='))) {
+			result.push('--host', '127.0.0.1')
 		}
-		return args
+		return result
 	},
 })

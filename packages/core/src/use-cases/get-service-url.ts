@@ -1,23 +1,23 @@
-import type { Result } from '../result.js'
-import { ok, err, isErr } from '../result.js'
-import type { IStateManager } from '../ports/state-manager.js'
 import type { IGitAdapter } from '../ports/git-adapter.js'
 import type { IProjectDetector } from '../ports/project-detector.js'
-import { Hostname } from '../values/hostname.js'
+import type { IStateManager } from '../ports/state-manager.js'
+import type { Result } from '../result.js'
+import { err, isErr, ok } from '../result.js'
 import { sanitizeForHostname, truncateLabel } from '../values/hostname-sanitizer.js'
+import { Hostname } from '../values/hostname.js'
 
 export interface GetServiceUrlDeps {
 	readonly state: IStateManager
 	readonly git: IGitAdapter
 	readonly project: IProjectDetector
-	readonly hashFn?: (input: string) => string
+	readonly hashFn?: ((input: string) => string) | undefined
 }
 
 export class GetServiceUrlUseCase {
 	constructor(private readonly deps: GetServiceUrlDeps) {}
 
-	async execute(name?: string, cwd?: string): Promise<Result<string, Error>> {
-		const resolvedCwd = cwd ?? process.cwd()
+	async execute(name: string | undefined, cwd: string): Promise<Result<string, Error>> {
+		const resolvedCwd = cwd
 		const proxyState = await this.deps.state.discoverState()
 		const proxyPort = proxyState.port?.value ?? 1355
 		const tls = proxyState.tls

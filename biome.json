@@ -15,6 +15,9 @@
       "complexity": {
         "noForEach": "off"
       },
+      "suspicious": {
+        "noExplicitAny": "warn"
+      },
       "style": {
         "noNonNullAssertion": "warn"
       }

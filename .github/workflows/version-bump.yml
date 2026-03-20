@@ -1,0 +1,60 @@
+name: Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      type:
+        description: 'Version bump type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  version-bump:
+    name: Bump ${{ github.event.inputs.type }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm test
+
+      - name: Create changeset
+        run: |
+          mkdir -p .changeset
+          BUMP="${{ github.event.inputs.type }}"
+          cat > .changeset/version-bump.md << EOF
+          ---
+          "localias": ${BUMP}
+          "@localias/core": ${BUMP}
+          "@localias/infra": ${BUMP}
+          "@localias/plugin-sdk": ${BUMP}
+          ---
+
+          Version ${BUMP} bump
+          EOF
+
+      - name: Apply changeset version
+        run: pnpm changeset version
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: bump version (${BUMP})"
+          git push
+        env:
+          BUMP: ${{ github.event.inputs.type }}

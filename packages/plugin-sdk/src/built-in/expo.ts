@@ -5,12 +5,13 @@ export const expoPlugin = definePlugin({
 	strictPort: false,
 	detect: (ctx) => ctx.command === 'expo',
 	injectFlags: (args, port) => {
-		if (!args.some((a) => a === '--port')) {
-			args.push('--port', String(port))
+		const result = [...args]
+		if (!result.some((a) => a === '--port' || a.startsWith('--port='))) {
+			result.push('--port', String(port))
 		}
-		if (!args.some((a) => a === '--host')) {
-			args.push('--host', 'localhost')
+		if (!result.some((a) => a === '--host' || a.startsWith('--host='))) {
+			result.push('--host', 'localhost')
 		}
-		return args
+		return result
 	},
 })

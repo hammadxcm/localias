@@ -1,4 +1,4 @@
-import type { FrameworkPlugin, FrameworkDetectionContext } from '@publify/core'
+import type { FrameworkDetectionContext, FrameworkPlugin } from '@localias/core'
 
 export interface PluginConfig {
 	readonly name: string

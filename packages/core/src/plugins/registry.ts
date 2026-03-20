@@ -1,4 +1,4 @@
-import type { FrameworkPlugin, FrameworkDetectionContext } from './types.js'
+import type { FrameworkDetectionContext, FrameworkPlugin } from './types.js'
 
 const PACKAGE_RUNNERS = new Set(['npx', 'bunx', 'pnpm', 'yarn'])
 const DLX_COMMANDS = new Set(['dlx', 'exec', 'x'])

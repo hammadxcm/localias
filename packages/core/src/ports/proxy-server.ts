@@ -1,7 +1,7 @@
 import type { Result } from '../result.js'
-import type { Route } from '../values/route.js'
-import type { ProxyConfig } from '../values/proxy-config.js'
 import type { CertificateInfo } from '../values/certificate-info.js'
+import type { ProxyConfig } from '../values/proxy-config.js'
+import type { Route } from '../values/route.js'
 
 export interface IProxyServer {
 	start(

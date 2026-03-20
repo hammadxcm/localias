@@ -1,9 +1,9 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
-import type { IProjectDetector, InferredProject } from '@publify/core'
-import type { Result } from '@publify/core'
-import { ok, err } from '@publify/core'
-import type { IGitAdapter } from '@publify/core'
+import type { IProjectDetector, InferredProject } from '@localias/core'
+import type { Result } from '@localias/core'
+import { err, ok } from '@localias/core'
+import type { IGitAdapter } from '@localias/core'
 
 export class FilesystemProjectDetector implements IProjectDetector {
 	constructor(private readonly git: IGitAdapter) {}

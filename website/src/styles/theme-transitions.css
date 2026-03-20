@@ -1,0 +1,469 @@
+/* ── View Transition Animations per Theme ── */
+
+/* Shared z-index for all transitions */
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 2;
+}
+
+/* Default (dark): Radial morph from click position */
+@keyframes theme-morph-out {
+  0% {
+    clip-path: circle(150% at 50% 50%);
+    filter: blur(0);
+    opacity: 1;
+  }
+  100% {
+    clip-path: circle(0% at 50% 50%);
+    filter: blur(4px);
+    opacity: 0;
+  }
+}
+@keyframes theme-morph-in {
+  0% {
+    clip-path: circle(0% at var(--transition-x, 50%) var(--transition-y, 50%));
+    filter: blur(4px);
+    opacity: 0;
+  }
+  60% {
+    filter: blur(1px);
+    opacity: 0.8;
+  }
+  100% {
+    clip-path: circle(150% at var(--transition-x, 50%) var(--transition-y, 50%));
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+[data-theme-transition="dark"]::view-transition-old(root) {
+  animation: theme-morph-out 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+[data-theme-transition="dark"]::view-transition-new(root) {
+  animation: theme-morph-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Light: Warm fade */
+@keyframes warm-fade-out {
+  0% {
+    filter: sepia(0) brightness(1);
+    opacity: 1;
+  }
+  40% {
+    filter: sepia(0.6) brightness(1.1);
+  }
+  100% {
+    filter: sepia(1) brightness(0.8);
+    opacity: 0;
+  }
+}
+@keyframes warm-fade-in {
+  0% {
+    filter: sepia(1) brightness(0.8);
+    opacity: 0;
+  }
+  60% {
+    filter: sepia(0.4) brightness(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    filter: sepia(0) brightness(1);
+    opacity: 1;
+  }
+}
+
+[data-theme-transition="light"]::view-transition-old(root) {
+  animation: warm-fade-out 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+[data-theme-transition="light"]::view-transition-new(root) {
+  animation: warm-fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Blood: Blood drip */
+@keyframes blood-drip-out {
+  0% {
+    clip-path: inset(0 0 0 0);
+    filter: saturate(1) brightness(1);
+    opacity: 1;
+  }
+  30% {
+    filter: saturate(2) brightness(0.7);
+  }
+  100% {
+    clip-path: inset(0 0 100% 0);
+    filter: saturate(3) brightness(0.3);
+    opacity: 0;
+  }
+}
+@keyframes blood-drip-in {
+  0% {
+    clip-path: inset(100% 0 0 0);
+    filter: saturate(3) brightness(0.3);
+    opacity: 0;
+  }
+  40% {
+    filter: saturate(2) brightness(0.6);
+    opacity: 0.6;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    filter: saturate(1) brightness(1);
+    opacity: 1;
+  }
+}
+
+[data-theme-transition="blood"]::view-transition-old(root) {
+  animation: blood-drip-out 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+[data-theme-transition="blood"]::view-transition-new(root) {
+  animation: blood-drip-in 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Arctic: Frost crystallize */
+@keyframes frost-crystallize-out {
+  0% {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+    filter: saturate(1);
+    opacity: 1;
+  }
+  50% {
+    filter: saturate(0.3) brightness(1.2);
+  }
+  100% {
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    filter: saturate(0);
+    opacity: 0;
+  }
+}
+@keyframes frost-crystallize-in {
+  0% {
+    clip-path: polygon(50% 50%, 50% 40%, 55% 45%, 50% 50%, 45% 45%, 50% 40%);
+    filter: saturate(0) brightness(1.3);
+    opacity: 0;
+  }
+  40% {
+    clip-path: polygon(50% 10%, 90% 30%, 90% 70%, 50% 90%, 10% 70%, 10% 30%);
+    filter: saturate(0.5);
+    opacity: 0.7;
+  }
+  100% {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+    filter: saturate(1) brightness(1);
+    opacity: 1;
+  }
+}
+
+[data-theme-transition="arctic"]::view-transition-old(root) {
+  animation: frost-crystallize-out 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+[data-theme-transition="arctic"]::view-transition-new(root) {
+  animation: frost-crystallize-in 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Nebula: Cosmic swirl */
+@keyframes cosmic-swirl-out {
+  0% {
+    clip-path: circle(150% at 50% 50%);
+    filter: hue-rotate(0deg) blur(0);
+    opacity: 1;
+  }
+  40% {
+    filter: hue-rotate(60deg) blur(3px);
+  }
+  100% {
+    clip-path: circle(0% at 50% 50%);
+    filter: hue-rotate(120deg) blur(8px);
+    opacity: 0;
+  }
+}
+@keyframes cosmic-swirl-in {
+  0% {
+    clip-path: circle(0% at 50% 50%);
+    filter: hue-rotate(120deg) blur(8px);
+    opacity: 0;
+  }
+  50% {
+    filter: hue-rotate(60deg) blur(3px);
+    opacity: 0.7;
+  }
+  100% {
+    clip-path: circle(150% at 50% 50%);
+    filter: hue-rotate(0deg) blur(0);
+    opacity: 1;
+  }
+}
+
+[data-theme-transition="nebula"]::view-transition-old(root) {
+  animation: cosmic-swirl-out 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+[data-theme-transition="nebula"]::view-transition-new(root) {
+  animation: cosmic-swirl-in 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Synthwave: VHS wipe */
+@keyframes vhs-wipe-out {
+  0% {
+    clip-path: inset(0 0 0 0);
+    filter: hue-rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    filter: hue-rotate(30deg) brightness(1.2);
+  }
+  50% {
+    clip-path: inset(50% 0 0 0);
+    filter: hue-rotate(-20deg) brightness(0.8);
+  }
+  75% {
+    filter: hue-rotate(40deg);
+  }
+  100% {
+    clip-path: inset(100% 0 0 0);
+    opacity: 0;
+    filter: hue-rotate(0deg);
+  }
+}
+@keyframes vhs-wipe-in {
+  0% {
+    clip-path: inset(0 0 100% 0);
+    filter: hue-rotate(40deg);
+    opacity: 0;
+  }
+  25% {
+    filter: hue-rotate(-30deg) brightness(1.3);
+  }
+  50% {
+    clip-path: inset(0 0 50% 0);
+    filter: hue-rotate(20deg);
+    opacity: 0.7;
+  }
+  75% {
+    filter: hue-rotate(-15deg) brightness(0.9);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    filter: hue-rotate(0deg);
+    opacity: 1;
+  }
+}
+
+[data-theme-transition="synthwave"]::view-transition-old(root) {
+  animation: vhs-wipe-out 0.5s steps(8) both;
+}
+[data-theme-transition="synthwave"]::view-transition-new(root) {
+  animation: vhs-wipe-in 0.5s steps(8) both;
+}
+
+/* Matrix: Glitch dissolve */
+@keyframes glitch-dissolve-out {
+  0% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    filter: hue-rotate(0deg);
+  }
+  20% {
+    clip-path: inset(0 0 80% 0);
+    filter: hue-rotate(30deg);
+  }
+  40% {
+    clip-path: inset(30% 0 40% 0);
+    filter: hue-rotate(-20deg);
+  }
+  60% {
+    clip-path: inset(60% 0 10% 0);
+    filter: hue-rotate(45deg);
+  }
+  80% {
+    clip-path: inset(10% 0 70% 0);
+    opacity: 0.3;
+    filter: hue-rotate(-30deg);
+  }
+  100% {
+    clip-path: inset(50% 0 50% 0);
+    opacity: 0;
+    filter: hue-rotate(0deg);
+  }
+}
+@keyframes glitch-dissolve-in {
+  0% {
+    clip-path: inset(50% 0 50% 0);
+    opacity: 0;
+    filter: hue-rotate(40deg);
+  }
+  15% {
+    clip-path: inset(0 0 80% 0);
+    opacity: 0.5;
+    filter: hue-rotate(-25deg);
+  }
+  35% {
+    clip-path: inset(40% 0 20% 0);
+    filter: hue-rotate(20deg);
+  }
+  55% {
+    clip-path: inset(10% 0 50% 0);
+    filter: hue-rotate(-15deg);
+  }
+  75% {
+    clip-path: inset(0 0 20% 0);
+    opacity: 0.8;
+    filter: hue-rotate(10deg);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    filter: hue-rotate(0deg);
+  }
+}
+
+[data-theme-transition="matrix"]::view-transition-old(root) {
+  animation: glitch-dissolve-out 0.5s steps(6) both;
+}
+[data-theme-transition="matrix"]::view-transition-new(root) {
+  animation: glitch-dissolve-in 0.5s steps(6) both;
+}
+
+/* Cyberpunk: Hologram glitch */
+@keyframes hologram-glitch-out {
+  0% {
+    clip-path: inset(0 0 0 0);
+    filter: hue-rotate(0deg);
+    transform: translateX(0) skewX(0deg);
+    opacity: 1;
+  }
+  15% {
+    clip-path: inset(20% 0 60% 0);
+    filter: hue-rotate(90deg);
+    transform: translateX(5px) skewX(2deg);
+  }
+  30% {
+    clip-path: inset(50% 0 20% 0);
+    filter: hue-rotate(-60deg);
+    transform: translateX(-8px) skewX(-3deg);
+  }
+  50% {
+    clip-path: inset(10% 0 70% 0);
+    filter: hue-rotate(120deg);
+    transform: translateX(10px) skewX(5deg);
+  }
+  70% {
+    clip-path: inset(40% 0 40% 0);
+    filter: hue-rotate(-90deg);
+    transform: translateX(-5px) skewX(-2deg);
+  }
+  100% {
+    clip-path: inset(50% 0 50% 0);
+    filter: hue-rotate(180deg);
+    transform: translateX(0) skewX(0deg);
+    opacity: 0;
+  }
+}
+@keyframes hologram-glitch-in {
+  0% {
+    clip-path: inset(50% 0 50% 0);
+    filter: hue-rotate(180deg);
+    transform: translateX(0) skewX(0deg);
+    opacity: 0;
+  }
+  15% {
+    clip-path: inset(60% 0 10% 0);
+    filter: hue-rotate(-90deg);
+    transform: translateX(-8px) skewX(-4deg);
+  }
+  30% {
+    clip-path: inset(0 0 70% 0);
+    filter: hue-rotate(60deg);
+    transform: translateX(6px) skewX(3deg);
+  }
+  50% {
+    clip-path: inset(30% 0 30% 0);
+    filter: hue-rotate(-120deg);
+    transform: translateX(-10px) skewX(-5deg);
+    opacity: 0.7;
+  }
+  70% {
+    clip-path: inset(5% 0 15% 0);
+    filter: hue-rotate(45deg);
+    transform: translateX(3px) skewX(1deg);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    filter: hue-rotate(0deg);
+    transform: translateX(0) skewX(0deg);
+    opacity: 1;
+  }
+}
+
+[data-theme-transition="cyberpunk"]::view-transition-old(root) {
+  animation: hologram-glitch-out 0.5s steps(8) both;
+}
+[data-theme-transition="cyberpunk"]::view-transition-new(root) {
+  animation: hologram-glitch-in 0.5s steps(8) both;
+}
+
+/* Gruvbox: TV static */
+@keyframes tv-static-out {
+  0% {
+    filter: brightness(1) contrast(1);
+    opacity: 1;
+  }
+  20% {
+    filter: brightness(1.8) contrast(1.5);
+  }
+  40% {
+    filter: brightness(0.6) contrast(2);
+  }
+  60% {
+    filter: brightness(2.5) contrast(0.8);
+    opacity: 0.7;
+  }
+  80% {
+    filter: brightness(3) contrast(0.5);
+    opacity: 0.3;
+  }
+  100% {
+    filter: brightness(4) contrast(0);
+    opacity: 0;
+  }
+}
+@keyframes tv-static-in {
+  0% {
+    filter: brightness(4) contrast(0);
+    opacity: 0;
+  }
+  20% {
+    filter: brightness(2.5) contrast(0.5);
+    opacity: 0.3;
+  }
+  40% {
+    filter: brightness(0.6) contrast(2);
+    opacity: 0.6;
+  }
+  60% {
+    filter: brightness(1.8) contrast(1.5);
+    opacity: 0.8;
+  }
+  80% {
+    filter: brightness(1.2) contrast(1.2);
+  }
+  100% {
+    filter: brightness(1) contrast(1);
+    opacity: 1;
+  }
+}
+
+[data-theme-transition="gruvbox"]::view-transition-old(root) {
+  animation: tv-static-out 0.45s steps(6) both;
+}
+[data-theme-transition="gruvbox"]::view-transition-new(root) {
+  animation: tv-static-in 0.45s steps(6) both;
+}
+
+/* ── Reduced Motion Override ── */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}

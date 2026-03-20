@@ -1,6 +1,6 @@
 {
-  "name": "@publify/infra",
-  "version": "0.0.0",
+  "name": "@localias/infra",
+  "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,12 +17,13 @@
     "lint": "biome check src/"
   },
   "dependencies": {
-    "@publify/core": "workspace:*",
     "@peculiar/x509": "^1.12.3",
+    "@localias/core": "workspace:*",
     "chalk": "^5.4.1",
     "write-file-atomic": "^6.0.0"
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
     "@types/write-file-atomic": "^4.0.3",
     "vitest": "^3.1.1"
   }

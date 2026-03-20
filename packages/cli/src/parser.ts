@@ -18,12 +18,18 @@ export class ArgParser {
 	}
 
 	option(name: string, alias?: string): string | undefined {
-		for (let i = 0; i < this.args.length - 1; i++) {
+		for (let i = 0; i < this.args.length; i++) {
 			if (this.consumed.has(i)) continue
 			if (this.args[i] === `--${name}` || (alias && this.args[i] === `-${alias}`)) {
+				const nextIdx = i + 1
+				if (nextIdx >= this.args.length || this.args[nextIdx]?.startsWith('-')) {
+					// Flag present but no value — consume just the flag, return undefined
+					this.consumed.add(i)
+					return undefined
+				}
 				this.consumed.add(i)
-				this.consumed.add(i + 1)
-				return this.args[i + 1]
+				this.consumed.add(nextIdx)
+				return this.args[nextIdx]
 			}
 		}
 		return undefined
@@ -32,14 +38,14 @@ export class ArgParser {
 	optionNumber(name: string, alias?: string): number | undefined {
 		const val = this.option(name, alias)
 		if (val === undefined) return undefined
-		const n = parseInt(val, 10)
+		const n = Number.parseInt(val, 10)
 		return Number.isNaN(n) ? undefined : n
 	}
 
 	positional(): string | undefined {
 		for (let i = 0; i < this.args.length; i++) {
 			if (this.consumed.has(i)) continue
-			if (this.args[i]!.startsWith('-')) continue
+			if (this.args[i]?.startsWith('-')) continue
 			this.consumed.add(i)
 			return this.args[i]
 		}
@@ -62,7 +68,10 @@ export class ArgParser {
 		const result: string[] = []
 		for (let i = 0; i < this.args.length; i++) {
 			if (this.consumed.has(i)) continue
-			if (this.args[i]!.startsWith('--') || (this.args[i]!.startsWith('-') && this.args[i]!.length === 2)) {
+			if (
+				this.args[i]?.startsWith('--') ||
+				(this.args[i]?.startsWith('-') && this.args[i]?.length === 2)
+			) {
 				result.push(this.args[i]!)
 			}
 		}

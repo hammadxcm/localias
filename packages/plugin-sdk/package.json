@@ -1,6 +1,6 @@
 {
-  "name": "@publify/plugin-sdk",
-  "version": "0.0.0",
+  "name": "@localias/plugin-sdk",
+  "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,7 +17,7 @@
     "lint": "biome check src/"
   },
   "dependencies": {
-    "@publify/core": "workspace:*"
+    "@localias/core": "workspace:*"
   },
   "devDependencies": {
     "vitest": "^3.1.1"

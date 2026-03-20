@@ -1,0 +1,323 @@
+---
+const themes = [
+  {
+    id: 'dark',
+    label: 'Dark',
+    color: '#0a0a0f',
+    icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+  },
+  {
+    id: 'light',
+    label: 'Light',
+    color: '#fafafa',
+    icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+  },
+  {
+    id: 'blood',
+    label: 'Blood',
+    color: '#0D0208',
+    icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c0 0-6 8.5-6 13a6 6 0 0 0 12 0C18 10.5 12 2 12 2z"/></svg>',
+  },
+  {
+    id: 'synthwave',
+    label: 'Synthwave',
+    color: '#1a1028',
+    icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="6"/><line x1="2" y1="14" x2="22" y2="14"/><line x1="4" y1="17" x2="20" y2="17"/><line x1="6" y1="20" x2="18" y2="20"/></svg>',
+  },
+  {
+    id: 'matrix',
+    label: 'Matrix',
+    color: '#0a0a0a',
+    icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>',
+  },
+  {
+    id: 'cyberpunk',
+    label: 'Cyberpunk',
+    color: '#0a0a12',
+    icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>',
+  },
+  {
+    id: 'gruvbox',
+    label: 'Gruvbox',
+    color: '#282828',
+    icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 4 3 3 3 7h6c0-4 3-3 3-7z"/><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="21" x2="14" y2="21"/></svg>',
+  },
+  {
+    id: 'arctic',
+    label: 'Arctic',
+    color: '#F0F9FF',
+    icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="5.64" y1="5.64" x2="18.36" y2="18.36"/><line x1="18.36" y1="5.64" x2="5.64" y2="18.36"/><line x1="12" y1="8" x2="8" y2="4"/><line x1="12" y1="8" x2="16" y2="4"/><line x1="12" y1="16" x2="8" y2="20"/><line x1="12" y1="16" x2="16" y2="20"/></svg>',
+  },
+  {
+    id: 'nebula',
+    label: 'Nebula',
+    color: '#0B0014',
+    icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  },
+];
+---
+
+<div class="theme-switcher">
+  <button class="theme-random-btn" id="theme-random" type="button" aria-label="Random theme" title="Random theme">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="2" y="2" width="20" height="20" rx="3"/>
+      <circle cx="8" cy="8" r="1.5" fill="currentColor"/>
+      <circle cx="16" cy="8" r="1.5" fill="currentColor"/>
+      <circle cx="8" cy="16" r="1.5" fill="currentColor"/>
+      <circle cx="16" cy="16" r="1.5" fill="currentColor"/>
+      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+    </svg>
+  </button>
+  <button class="theme-btn" id="theme-toggle" type="button" aria-label="Switch theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-dropdown">
+    <span class="theme-icon" id="theme-current-icon" set:html={themes[0].icon}></span>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+  <div class="theme-dropdown" id="theme-dropdown" role="menu">
+    {themes.map((t) => (
+      <button class="theme-option" data-theme-id={t.id} data-theme-icon={t.icon} data-theme-color={t.color} role="menuitem" type="button">
+        <span class="theme-option-icon" set:html={t.icon}></span>
+        {t.label}
+      </button>
+    ))}
+  </div>
+</div>
+
+<style>
+  .theme-switcher {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .theme-random-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s, transform 0.3s;
+  }
+
+  .theme-random-btn:hover {
+    color: var(--text);
+    border-color: var(--text-muted);
+  }
+
+  .theme-random-btn:active {
+    transform: rotate(180deg);
+  }
+
+  .theme-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: var(--font-sans);
+    transition: color 0.2s, border-color 0.2s;
+    min-height: 36px;
+  }
+
+  .theme-btn:hover {
+    color: var(--text);
+    border-color: var(--text-muted);
+  }
+
+  .theme-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .theme-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 6px;
+    min-width: 150px;
+    z-index: 200;
+    box-shadow: 0 8px 30px var(--card-shadow);
+  }
+
+  .theme-dropdown.open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .theme-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: background 0.15s, color 0.15s;
+    min-height: 36px;
+    width: 100%;
+    text-align: left;
+  }
+
+  .theme-option:hover {
+    background: var(--icon-bg);
+    color: var(--text);
+  }
+
+  .theme-option.active {
+    color: var(--red);
+    font-weight: 600;
+  }
+
+  .theme-option-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+</style>
+
+<script>
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeDropdown = document.getElementById('theme-dropdown');
+  const currentIcon = document.getElementById('theme-current-icon');
+  const themeRandomBtn = document.getElementById('theme-random');
+  const themeOptions = Array.from(themeDropdown?.querySelectorAll<HTMLElement>('[role="menuitem"]') || []);
+
+  const allThemeIds = themeOptions.map(opt => opt.getAttribute('data-theme-id')!);
+
+  function getCurrentTheme(): string {
+    const attr = document.documentElement.getAttribute('data-theme');
+    return attr || 'dark';
+  }
+
+  function updateActiveState() {
+    const current = getCurrentTheme();
+    for (const opt of themeOptions) {
+      const isActive = opt.getAttribute('data-theme-id') === current;
+      opt.classList.toggle('active', isActive);
+      if (isActive && currentIcon) {
+        const iconHtml = opt.getAttribute('data-theme-icon');
+        if (iconHtml) currentIcon.innerHTML = iconHtml;
+      }
+    }
+  }
+
+  function applyTheme(name: string) {
+    const transitionName = name;
+
+    const apply = () => {
+      if (name === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+      } else {
+        document.documentElement.setAttribute('data-theme', name);
+      }
+      localStorage.setItem('theme', name);
+      updateActiveState();
+      document.documentElement.removeAttribute('data-theme-transition');
+      window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: name } }));
+    };
+
+    if (document.startViewTransition) {
+      document.documentElement.setAttribute('data-theme-transition', transitionName);
+      document.startViewTransition(apply);
+    } else {
+      apply();
+    }
+  }
+
+  function openDropdown() {
+    themeDropdown?.classList.add('open');
+    themeToggle?.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeDropdown(refocus = false) {
+    themeDropdown?.classList.remove('open');
+    themeToggle?.setAttribute('aria-expanded', 'false');
+    if (refocus) themeToggle?.focus();
+  }
+
+  themeToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = themeDropdown?.classList.contains('open');
+    if (isOpen) {
+      closeDropdown();
+    } else {
+      openDropdown();
+      themeOptions[0]?.focus();
+    }
+  });
+
+  themeToggle?.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      openDropdown();
+      themeOptions[0]?.focus();
+    }
+  });
+
+  for (const opt of themeOptions) {
+    opt.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = opt.getAttribute('data-theme-id');
+      if (id) applyTheme(id);
+      closeDropdown(true);
+    });
+  }
+
+  themeDropdown?.addEventListener('keydown', (e) => {
+    const idx = themeOptions.indexOf(document.activeElement as HTMLElement);
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeDropdown(true);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      themeOptions[(idx + 1) % themeOptions.length]?.focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      themeOptions[(idx - 1 + themeOptions.length) % themeOptions.length]?.focus();
+    } else if (e.key === 'Tab') {
+      closeDropdown();
+    }
+  });
+
+  document.addEventListener('click', () => {
+    closeDropdown();
+  });
+
+  // Random theme button
+  themeRandomBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeDropdown();
+    const current = getCurrentTheme();
+    const choices = allThemeIds.filter((t) => t !== current);
+    const randomTheme = choices[Math.floor(Math.random() * choices.length)];
+    applyTheme(randomTheme);
+  });
+
+  // Initialize active state
+  updateActiveState();
+</script>

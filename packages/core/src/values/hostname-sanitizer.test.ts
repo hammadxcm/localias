@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { sanitizeForHostname, truncateLabel } from './hostname-sanitizer.js'
 
 describe('sanitizeForHostname', () => {
@@ -38,5 +38,31 @@ describe('truncateLabel', () => {
 		const result = truncateLabel(long, (s) => 'abcdef1234567890')
 		expect(result.length).toBe(63)
 		expect(result).toMatch(/-abcdef12$/)
+	})
+})
+
+describe('sanitizeForHostname edge cases', () => {
+	it('handles all-invalid characters', () => {
+		expect(sanitizeForHostname('!!!')).toBe('')
+	})
+
+	it('handles all-hyphens', () => {
+		expect(sanitizeForHostname('---')).toBe('')
+	})
+})
+
+describe('truncateLabel edge cases', () => {
+	it('does not produce labels ending with hyphen (no hash)', () => {
+		const input = `${'a'.repeat(62)}-${'b'.repeat(10)}`
+		const result = truncateLabel(input)
+		expect(result).not.toMatch(/-$/)
+		expect(result.length).toBeLessThanOrEqual(63)
+	})
+
+	it('does not produce labels ending with hyphen (with hash)', () => {
+		const input = `${'a'.repeat(53)}-${'b'.repeat(20)}`
+		const result = truncateLabel(input, () => 'deadbeef12345678')
+		expect(result).not.toMatch(/-$/)
+		expect(result.length).toBeLessThanOrEqual(63)
 	})
 })

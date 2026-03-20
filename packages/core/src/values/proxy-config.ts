@@ -1,8 +1,8 @@
-import type { Result } from '../result.js'
-import { ok, err } from '../result.js'
 import { ConfigValidationError } from '../errors.js'
-import { Port } from './port.js'
+import type { Result } from '../result.js'
+import { err, ok } from '../result.js'
 import { unwrap } from '../result.js'
+import { Port } from './port.js'
 
 export class ProxyConfig {
 	private constructor(
@@ -13,16 +13,16 @@ export class ProxyConfig {
 	) {}
 
 	static create(opts: {
-		port?: number
-		tld?: string
-		tls?: boolean
-		stateDir?: string
+		port?: number | undefined
+		tld?: string | undefined
+		tls?: boolean | undefined
+		stateDir?: string | undefined
 	}): Result<ProxyConfig, ConfigValidationError> {
 		const defaults = ProxyConfig.defaults()
 		const portResult = Port.create(opts.port ?? defaults.port.value)
 		if (portResult._tag === 'Err') return err(portResult.error)
 
-		const tld = opts.tld ?? defaults.tld
+		const tld = (opts.tld ?? defaults.tld).toLowerCase()
 		if (!/^[a-z][a-z0-9]*$/.test(tld)) {
 			return err(new ConfigValidationError(`Invalid TLD: "${tld}"`))
 		}
@@ -38,6 +38,6 @@ export class ProxyConfig {
 	}
 
 	static defaults(): ProxyConfig {
-		return new ProxyConfig(unwrap(Port.create(1355)), 'localhost', false, '/tmp/publify')
+		return new ProxyConfig(unwrap(Port.create(1355)), 'localhost', false, '/tmp/localias')
 	}
 }

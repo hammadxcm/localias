@@ -1,5 +1,5 @@
-import type { Container } from '@publify/infra'
-import { isErr } from '@publify/core'
+import { isErr } from '@localias/core'
+import type { Container } from '@localias/infra'
 
 export async function proxyStopCommand(container: Container): Promise<void> {
 	const result = await container.stopProxy.execute()

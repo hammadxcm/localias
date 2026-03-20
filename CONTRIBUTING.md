@@ -1,11 +1,11 @@
-# Contributing to Publify
+# Contributing to Localias
 
 ## Quick Start
 
 ```bash
 # Clone and install
-git clone https://github.com/user/publify
-cd publify
+git clone https://github.com/user/localias
+cd localias
 pnpm install
 
 # Build all packages
@@ -23,14 +23,14 @@ pnpm typecheck
 
 ## Architecture
 
-Publify follows clean architecture with four packages:
+Localias follows clean architecture with four packages:
 
 | Package | Purpose | Dependencies |
 |---------|---------|-------------|
-| `@publify/core` | Domain logic, interfaces, value objects | None (pure TS) |
-| `@publify/infra` | Node.js implementations of core interfaces | `@publify/core` |
-| `@publify/plugin-sdk` | Framework plugin definitions | `@publify/core` |
-| `publify` (cli) | CLI entry point, arg parsing, output | All packages |
+| `@localias/core` | Domain logic, interfaces, value objects | None (pure TS) |
+| `@localias/infra` | Node.js implementations of core interfaces | `@localias/core` |
+| `@localias/plugin-sdk` | Framework plugin definitions | `@localias/core` |
+| `localias` (cli) | CLI entry point, arg parsing, output | All packages |
 
 **Key rule**: `core` has zero runtime dependencies and no Node.js imports. All I/O goes through port interfaces.
 

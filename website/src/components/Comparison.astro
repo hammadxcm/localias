@@ -1,0 +1,99 @@
+---
+import Terminal from './Terminal.astro';
+---
+
+<section class="section comparison" id="comparison">
+  <div class="container">
+    <h2 class="section-title reveal">
+      Before & <span class="gradient-text">After</span>
+    </h2>
+    <p class="section-subtitle reveal">Stop memorizing port numbers.</p>
+    <div class="comparison-grid">
+      <div class="comparison-side comparison-old reveal">
+        <h3 class="comparison-label comparison-label--old">Without localias</h3>
+        <Terminal title="bash">
+          <div class="terminal-line">
+            <span class="terminal-prompt">$ </span><span class="terminal-command">docker compose up</span>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-output">web-1  | listening on :3000</span>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-output">api-1  | listening on :8080</span>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-output">docs-1 | listening on :4000</span>
+          </div>
+          <div class="terminal-line">&nbsp;</div>
+          <div class="terminal-line">
+            <span class="terminal-error"># which port was the API again? 8080? 3000?</span>
+          </div>
+        </Terminal>
+      </div>
+      <div class="comparison-side comparison-new reveal" style="--delay: 0.15s">
+        <h3 class="comparison-label comparison-label--new">With localias</h3>
+        <Terminal title="localias">
+          <div class="terminal-line">
+            <span class="terminal-prompt">$ </span><span class="terminal-command">localias compose -- docker compose up</span>
+          </div>
+          <div class="terminal-line">&nbsp;</div>
+          <div class="terminal-line">
+            <span class="terminal-success">web.myapp.localhost:1355   </span><span class="terminal-output">running</span>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-success">api.myapp.localhost:1355   </span><span class="terminal-output">running</span>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-success">docs.myapp.localhost:1355  </span><span class="terminal-output">running</span>
+          </div>
+          <div class="terminal-line">&nbsp;</div>
+        </Terminal>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .comparison-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+
+  .comparison-label--old {
+    color: var(--text-muted);
+    background: var(--icon-bg);
+  }
+
+  .comparison-label--new {
+    color: var(--green);
+    background: rgba(81, 207, 102, 0.1);
+  }
+
+  .comparison-old :global(.terminal) {
+    opacity: 0.7;
+  }
+
+  .comparison-new :global(.terminal) {
+    border-color: var(--green);
+    box-shadow: 0 0 30px rgba(81, 207, 102, 0.08);
+  }
+
+  @media (max-width: 768px) {
+    .comparison-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

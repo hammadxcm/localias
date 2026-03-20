@@ -1,0 +1,28 @@
+---
+import Comparison from '../components/Comparison.astro';
+import Demo from '../components/Demo.astro';
+import Features from '../components/Features.astro';
+import Footer from '../components/Footer.astro';
+import Hero from '../components/Hero.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import Install from '../components/Install.astro';
+import Marquee from '../components/Marquee.astro';
+import Navbar from '../components/Navbar.astro';
+import Stats from '../components/Stats.astro';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="localias — stable .localhost URLs for every dev service">
+  <Navbar />
+  <main id="main-content">
+    <Hero />
+    <Marquee />
+    <Stats />
+    <Features />
+    <HowItWorks />
+    <Install />
+    <Demo />
+    <Comparison />
+  </main>
+  <Footer />
+</Layout>

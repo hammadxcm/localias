@@ -1,17 +1,17 @@
-import type { Result } from '../result.js'
-import { ok, err, isErr } from '../result.js'
-import type { IRouteRepository } from '../ports/route-repository.js'
+import type { PluginRegistry } from '../plugins/registry.js'
+import type { IGitAdapter } from '../ports/git-adapter.js'
+import type { ILogger } from '../ports/logger.js'
 import type { IPortAllocator } from '../ports/port-allocator.js'
 import type { IProcessManager } from '../ports/process-manager.js'
-import type { IStateManager } from '../ports/state-manager.js'
-import type { IGitAdapter } from '../ports/git-adapter.js'
 import type { IProjectDetector } from '../ports/project-detector.js'
-import type { ILogger } from '../ports/logger.js'
+import type { IRouteRepository } from '../ports/route-repository.js'
+import type { IStateManager } from '../ports/state-manager.js'
+import type { Result } from '../result.js'
+import { err, isErr, ok } from '../result.js'
+import { sanitizeForHostname, truncateLabel } from '../values/hostname-sanitizer.js'
 import { Hostname } from '../values/hostname.js'
 import { Port } from '../values/port.js'
 import { Route } from '../values/route.js'
-import { sanitizeForHostname, truncateLabel } from '../values/hostname-sanitizer.js'
-import { PluginRegistry } from '../plugins/registry.js'
 
 export interface RunAppDeps {
 	readonly routes: IRouteRepository
@@ -22,23 +22,28 @@ export interface RunAppDeps {
 	readonly project: IProjectDetector
 	readonly logger: ILogger
 	readonly plugins: PluginRegistry
-	readonly hashFn?: (input: string) => string
+	readonly hashFn?: ((input: string) => string) | undefined
 }
 
 export interface RunAppParams {
 	readonly command: string[]
-	readonly name?: string
-	readonly force?: boolean
-	readonly appPort?: number
-	readonly cwd?: string
-	readonly tld?: string
+	readonly name?: string | undefined
+	readonly force?: boolean | undefined
+	readonly appPort?: number | undefined
+	readonly cwd?: string | undefined
+	readonly tld?: string | undefined
 }
 
 export class RunAppUseCase {
 	constructor(private readonly deps: RunAppDeps) {}
 
-	async execute(params: RunAppParams): Promise<Result<{ url: string; hostname: string; port: number }, Error>> {
-		const cwd = params.cwd ?? process.cwd()
+	async execute(
+		params: RunAppParams,
+	): Promise<Result<{ url: string; hostname: string; port: number }, Error>> {
+		if (!params.cwd) {
+			return err(new Error('cwd is required'))
+		}
+		const cwd = params.cwd
 		const tld = params.tld ?? 'localhost'
 
 		// 1. Infer project name
@@ -51,7 +56,9 @@ export class RunAppUseCase {
 				return err(inferred.error)
 			}
 			baseName = sanitizeForHostname(inferred.value.name)
-			this.deps.logger.debug(`Inferred project name: ${inferred.value.name} (source: ${inferred.value.source})`)
+			this.deps.logger.debug(
+				`Inferred project name: ${inferred.value.name} (source: ${inferred.value.source})`,
+			)
 		}
 
 		// 2. Detect worktree prefix
@@ -74,7 +81,7 @@ export class RunAppUseCase {
 		// 4. Discover proxy state
 		const proxyState = await this.deps.state.discoverState()
 		if (!proxyState.running) {
-			this.deps.logger.warn('Proxy is not running. Start it with: publify proxy start')
+			this.deps.logger.warn('Proxy is not running. Start it with: localias proxy start')
 		}
 
 		// 5. Allocate port for the app
@@ -107,8 +114,8 @@ export class RunAppUseCase {
 		// 9. Spawn child process
 		const env: Record<string, string> = {
 			PORT: String(appPort.value),
-			PUBLIFY_URL: url,
-			PUBLIFY_HOSTNAME: hostname.value,
+			LOCALIAS_URL: url,
+			LOCALIAS_HOSTNAME: hostname.value,
 		}
 
 		this.deps.logger.info(`${hostname.value} → 127.0.0.1:${appPort.value}`)

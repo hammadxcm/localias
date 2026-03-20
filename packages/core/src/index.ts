@@ -12,6 +12,7 @@ export {
 	HostnameValidationError,
 	ProxyLoopError,
 	ConfigValidationError,
+	ComposeParseError,
 } from './errors.js'
 
 // Value objects
@@ -43,6 +44,8 @@ export type {
 	InferredProject,
 	IStateManager,
 	ProxyState,
+	IComposeAdapter,
+	ComposeServiceInfo,
 } from './ports/index.js'
 
 // Middleware
@@ -71,6 +74,7 @@ export {
 	TrustCaUseCase,
 	SyncHostsUseCase,
 	CleanHostsUseCase,
+	RunComposeUseCase,
 } from './use-cases/index.js'
 
 export type {
@@ -88,4 +92,7 @@ export type {
 	TrustCaDeps,
 	SyncHostsDeps,
 	CleanHostsDeps,
+	RunComposeDeps,
+	RunComposeParams,
+	ComposeRouteInfo,
 } from './use-cases/index.js'

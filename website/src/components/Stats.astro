@@ -1,0 +1,197 @@
+---
+---
+
+<section class="section stats-section" id="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <a class="stat-card reveal" href="https://www.npmjs.com/package/localias" target="_blank" rel="noopener" id="stat-downloads">
+        <div class="stat-value" data-fetch="npm">
+          <span class="stat-loading"></span>
+        </div>
+        <div class="stat-label">npm Downloads</div>
+      </a>
+
+      <a class="stat-card reveal" href="https://github.com/hammadxcm/localias" target="_blank" rel="noopener" id="stat-stars">
+        <div class="stat-value" data-fetch="github">
+          <span class="stat-loading"></span>
+        </div>
+        <div class="stat-label">GitHub Stars</div>
+      </a>
+
+      <div class="stat-card reveal">
+        <div class="stat-value" data-static="0">0</div>
+        <div class="stat-label">Dependencies</div>
+      </div>
+
+      <div class="stat-card reveal">
+        <div class="stat-value" data-static="2">2</div>
+        <div class="stat-label">Platforms</div>
+      </div>
+
+      <div class="stat-card reveal">
+        <div class="stat-value" data-static="4">4</div>
+        <div class="stat-label">Packages</div>
+      </div>
+
+      <div class="stat-card reveal">
+        <div class="stat-value" data-static="155">155</div>
+        <div class="stat-label">Tests</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .stats-section {
+    padding: 48px 0 64px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px 16px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: border-color 0.3s, transform 0.2s;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  a.stat-card:hover {
+    border-color: var(--red);
+    transform: translateY(-2px);
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--text);
+    min-height: 2.4rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+
+  .stat-loading {
+    display: inline-block;
+    width: 48px;
+    height: 1.6rem;
+    background: var(--border);
+    border-radius: 6px;
+    animation: stat-pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes stat-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+  }
+
+  @media (max-width: 768px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stat-value {
+      font-size: 1.5rem;
+    }
+
+    .stat-card {
+      padding: 18px 12px;
+    }
+  }
+</style>
+
+<script>
+  function animateCounter(el: HTMLElement, target: number) {
+    const duration = 1200;
+    const start = performance.now();
+    const format = target >= 1000
+      ? (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(Math.floor(n))
+      : (n: number) => String(Math.floor(n));
+
+    function tick(now: number) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = eased * target;
+      el.textContent = format(current);
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const el = entry.target as HTMLElement;
+        const staticVal = el.dataset.static;
+        if (staticVal) {
+          animateCounter(el, Number(staticVal));
+        }
+        observer.unobserve(el);
+      }
+    },
+    { threshold: 0.3 },
+  );
+
+  document.querySelectorAll<HTMLElement>('.stat-value[data-static]').forEach((el) => {
+    observer.observe(el);
+  });
+
+  async function fetchNpmDownloads() {
+    const el = document.querySelector<HTMLElement>('.stat-value[data-fetch="npm"]');
+    if (!el) return;
+    try {
+      const res = await fetch('https://api.npmjs.org/downloads/point/last-month/localias');
+      const data = await res.json();
+      const count = data.downloads ?? 0;
+      el.innerHTML = '';
+      animateCounter(el, count);
+    } catch {
+      el.textContent = '—';
+    }
+  }
+
+  async function fetchGitHubStars() {
+    const el = document.querySelector<HTMLElement>('.stat-value[data-fetch="github"]');
+    if (!el) return;
+    try {
+      const res = await fetch('https://api.github.com/repos/hammadxcm/localias');
+      const data = await res.json();
+      const stars = data.stargazers_count ?? 0;
+      el.innerHTML = '';
+      animateCounter(el, stars);
+    } catch {
+      el.textContent = '—';
+    }
+  }
+
+  fetchNpmDownloads();
+  fetchGitHubStars();
+</script>

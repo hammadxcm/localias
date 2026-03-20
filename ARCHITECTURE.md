@@ -52,8 +52,8 @@ The architecture supports these future features without modifying existing code:
 
 1. **Dashboard** — Add `onRequest` event to proxy server
 2. **Health Checks** — Add `healthCheckUrl` to Route
-3. **`.publifyrc`** — Add `IConfigLoader` port
+3. **`.localiasrc`** — Add `IConfigLoader` port
 4. **Profiles** — Add `profile` field to ProxyConfig
-5. **`publify doctor`** — Add `IDiagnostic` interface
+5. **`localias doctor`** — Add `IDiagnostic` interface
 6. **Request Inspector** — Add middleware slot in pipeline
 7. **Metrics** — Add middleware for counting/latency

@@ -1,0 +1,144 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description = 'Stable .localhost URLs for every dev service. A local reverse proxy that gives your projects memorable hostnames with zero config.',
+  canonicalUrl,
+  ogImage = 'https://localias.fyniti.co.uk/favicon.svg',
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const siteUrl = 'https://localias.fyniti.co.uk';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0a0a0f" />
+    <meta name="robots" content="index, follow" />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content="localias" />
+    <meta property="og:locale" content="en" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "localias",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "macOS, Linux",
+      "description": description,
+      "author": { "@type": "Person", "name": "Hammad Khan" },
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    })} />
+    <script is:inline>
+      (function() {
+        var t = localStorage.getItem('theme');
+        if (t && t !== 'dark') {
+          document.documentElement.setAttribute('data-theme', t);
+        } else if (!t && window.matchMedia('(prefers-color-scheme: light)').matches) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+    <div class="spotlight" id="spotlight" aria-hidden="true"></div>
+    <div class="ambient" aria-hidden="true">
+      <div class="ambient-blob ambient-blob--1"></div>
+      <div class="ambient-blob ambient-blob--2"></div>
+      <div class="ambient-blob ambient-blob--3"></div>
+    </div>
+    <canvas id="theme-canvas" class="theme-canvas" aria-hidden="true"></canvas>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+    <slot />
+    <script>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.1 },
+      );
+
+      document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+      // Parallax scroll variable + scroll progress
+      const progressBar = document.getElementById('scroll-progress');
+      let ticking = false;
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            const scrollY = window.scrollY;
+            document.documentElement.style.setProperty('--scroll', String(scrollY));
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            if (progressBar && docHeight > 0) {
+              progressBar.style.transform = `scaleX(${scrollY / docHeight})`;
+            }
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      // Theme canvas effects
+      import { initThemeEffects } from '../scripts/theme-effects';
+      initThemeEffects();
+
+      // Mouse spotlight
+      const spotlight = document.getElementById('spotlight');
+      if (spotlight && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.addEventListener('mousemove', (e) => {
+          spotlight.style.setProperty('--mx', `${e.clientX}px`);
+          spotlight.style.setProperty('--my', `${e.clientY}px`);
+        });
+      }
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+  @import '../styles/themes.css';
+  @import '../styles/theme-transitions.css';
+  @import '../styles/animations.css';
+  @import '../styles/terminal.css';
+
+  .theme-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+</style>

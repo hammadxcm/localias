@@ -28,6 +28,9 @@ export { X509CertificateManager, PlatformTrustManager } from './certs/index.js'
 // Proxy
 export { NodeProxyServer, PageRenderer } from './proxy/index.js'
 
+// Compose
+export { ShellComposeAdapter } from './compose/index.js'
+
 // Container
 export { createContainer, createDefaultContainer } from './container.js'
 export type { Container, ContainerOverrides } from './container.js'

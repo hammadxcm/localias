@@ -1,8 +1,8 @@
 import net from 'node:net'
-import type { IPortAllocator, Port } from '@publify/core'
-import type { Result } from '@publify/core'
-import { ok, err, isErr } from '@publify/core'
-import { Port as PortVO, PortExhaustedError } from '@publify/core'
+import type { IPortAllocator, Port } from '@localias/core'
+import type { Result } from '@localias/core'
+import { err, isErr, ok } from '@localias/core'
+import { PortExhaustedError, Port as PortVO } from '@localias/core'
 
 const DEFAULT_MIN = 4000
 const DEFAULT_MAX = 4999
@@ -20,7 +20,10 @@ function testPort(port: number): Promise<boolean> {
 }
 
 export class TcpPortAllocator implements IPortAllocator {
-	async findFreePort(min = DEFAULT_MIN, max = DEFAULT_MAX): Promise<Result<Port, PortExhaustedError>> {
+	async findFreePort(
+		min = DEFAULT_MIN,
+		max = DEFAULT_MAX,
+	): Promise<Result<Port, PortExhaustedError>> {
 		// Random attempts first
 		for (let i = 0; i < RANDOM_ATTEMPTS; i++) {
 			const port = min + Math.floor(Math.random() * (max - min + 1))

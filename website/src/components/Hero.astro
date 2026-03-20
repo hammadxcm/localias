@@ -1,0 +1,467 @@
+---
+import Terminal from './Terminal.astro';
+---
+
+<section class="hero" id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-floats" aria-hidden="true">
+    <span class="hero-float" style="left:5%;top:20%;animation-delay:0s;font-size:1.8rem">myapp.localhost</span>
+    <span class="hero-float" style="left:80%;top:15%;animation-delay:3s;font-size:1.4rem">api.localhost</span>
+    <span class="hero-float" style="left:70%;top:75%;animation-delay:7s;font-size:1.6rem">web.localhost</span>
+    <span class="hero-float" style="left:10%;top:72%;animation-delay:5s;font-size:1.2rem">docs.localhost</span>
+    <span class="hero-float" style="left:45%;top:8%;animation-delay:2s;font-size:1rem">admin.localhost</span>
+    <span class="hero-float" style="left:88%;top:55%;animation-delay:9s;font-size:1.5rem">auth.localhost</span>
+  </div>
+  <div class="container hero-grid">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        stable .localhost URLs for<br />
+        <span class="gradient-text" id="hero-rotating-word" aria-live="polite" aria-atomic="true">every dev service.</span>
+      </h1>
+      <p class="hero-description">
+        A local reverse proxy that gives your projects memorable hostnames.
+        No more port numbers, no more <code>localhost:3847</code>. Just <code>myapp.localhost</code>.
+      </p>
+      <div class="hero-actions">
+        <a href="#install" class="btn btn--primary">Get Started</a>
+        <a
+          href="https://github.com/hammadxcm/localias"
+          class="btn btn--outline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View on GitHub
+        </a>
+      </div>
+    </div>
+    <div class="hero-terminal" aria-hidden="true">
+      <Terminal title="localias">
+        <div class="anim-container" id="hero-anim">
+          <div class="anim-line anim-typing">
+            <span class="terminal-prompt">$ </span><span class="terminal-command">localias run -- npm run dev</span>
+          </div>
+          <div class="anim-line anim-found">
+            <span class="terminal-output">detecting framework... </span>
+            <span class="terminal-success">vite</span>
+          </div>
+          <div class="anim-line anim-port">
+            <span class="terminal-output">allocated port </span>
+            <span class="terminal-warning">3291</span>
+          </div>
+          <div class="anim-line anim-route">
+            <span class="terminal-success">route registered: </span>
+            <span class="terminal-command">myapp.localhost:1355</span>
+          </div>
+          <div class="anim-line anim-ready">
+            <span class="terminal-success">ready at http://myapp.localhost:1355</span>
+          </div>
+        </div>
+      </Terminal>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding: 160px 0 100px;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%) translateY(calc(var(--scroll, 0) * 0.1px));
+    width: 900px;
+    height: 700px;
+    background:
+      radial-gradient(ellipse at 40% 50%, rgba(255, 107, 107, var(--glow-opacity)) 0%, transparent 60%),
+      radial-gradient(ellipse at 60% 40%, rgba(34, 211, 238, calc(var(--glow-opacity) * 0.5)) 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 60%, rgba(255, 212, 59, calc(var(--glow-opacity) * 0.3)) 0%, transparent 60%);
+    animation: glow 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+    position: relative;
+  }
+
+  .hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+  }
+
+  #hero-rotating-word {
+    display: inline-block;
+    position: relative;
+  }
+
+  @keyframes word-in {
+    0% {
+      opacity: 0;
+      transform: translateY(100%) rotateX(-80deg);
+      filter: blur(8px);
+    }
+    60% {
+      opacity: 1;
+      transform: translateY(-8%) rotateX(5deg);
+      filter: blur(0);
+    }
+    80% {
+      transform: translateY(2%);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) rotateX(0deg);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes word-out {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+    30% {
+      opacity: 0.8;
+      transform: translateY(-10%) scale(1.04);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-120%) scale(0.9);
+      filter: blur(6px);
+    }
+  }
+
+  @keyframes word-glow {
+    0% {
+      text-shadow: none;
+    }
+    50% {
+      text-shadow:
+        0 0 20px var(--glow-color, rgba(255, 107, 107, 0.6)),
+        0 0 40px color-mix(in srgb, var(--glow-color, rgba(255, 107, 107, 0.6)) 50%, transparent),
+        0 0 60px color-mix(in srgb, var(--glow-color, rgba(255, 107, 107, 0.6)) 17%, transparent);
+    }
+    100% {
+      text-shadow: none;
+    }
+  }
+
+  #hero-rotating-word.entering {
+    animation: word-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+      word-glow 0.8s ease 0.2s;
+  }
+
+  #hero-rotating-word.leaving {
+    animation: word-out 0.35s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+  }
+
+  .hero-description {
+    color: var(--text-muted);
+    font-size: 1.15rem;
+    line-height: 1.7;
+    margin-bottom: 36px;
+    max-width: 480px;
+  }
+
+  .hero-description code {
+    color: var(--cyan);
+    font-size: 0.95em;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    min-height: 44px;
+  }
+
+  .hero-floats {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .hero-float {
+    position: absolute;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--red);
+    opacity: 0.04;
+    animation: float 18s ease-in-out infinite;
+  }
+
+  .btn--primary {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--red), #ff8787);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.15);
+  }
+
+  .btn--primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.2) 45%,
+      rgba(255, 255, 255, 0.05) 55%,
+      transparent 60%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .btn--primary:hover {
+    opacity: 1;
+    box-shadow:
+      0 0 30px rgba(255, 107, 107, 0.35),
+      0 0 60px rgba(255, 107, 107, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .btn--outline {
+    border: 1px solid var(--border);
+    color: var(--text);
+    background: transparent;
+  }
+
+  .btn--outline:hover {
+    border-color: var(--text-muted);
+    opacity: 1;
+  }
+
+  .hero-terminal {
+    position: relative;
+  }
+
+  /* Animation sequence */
+  .anim-container {
+    --seq-typing: 0s;
+    --seq-found: 1.5s;
+    --seq-port: 2.2s;
+    --seq-route: 2.8s;
+    --seq-ready: 3.4s;
+  }
+
+  .anim-line {
+    opacity: 0;
+  }
+
+  .anim-typing {
+    overflow: hidden;
+    white-space: nowrap;
+    width: 0;
+    opacity: 1;
+    animation:
+      typing 0.8s steps(26) var(--seq-typing) forwards,
+      blink-caret 0.5s step-end 3;
+    animation-delay: var(--seq-typing);
+    animation-iteration-count: 1, 3;
+    border-right: 2px solid var(--green);
+    animation-fill-mode: forwards;
+  }
+
+  .anim-found {
+    animation: fade-in 0.4s ease var(--seq-found) forwards;
+  }
+
+  .anim-port {
+    animation: fade-in 0.4s ease var(--seq-port) forwards;
+  }
+
+  .anim-route {
+    animation: fade-in 0.4s ease var(--seq-route) forwards;
+  }
+
+  .anim-ready {
+    animation: fade-in 0.4s ease var(--seq-ready) forwards;
+  }
+
+  @media (max-width: 768px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 48px;
+      text-align: center;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+    }
+
+    .hero-description {
+      max-width: none;
+    }
+
+    .hero-actions {
+      justify-content: center;
+    }
+
+    .hero {
+      padding: 120px 0 64px;
+    }
+
+    .hero-terminal {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .hero-description {
+      font-size: 1rem;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      font-size: 0.9rem;
+      justify-content: center;
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  const scenarios = [
+    {
+      command: 'localias run -- npm run dev',
+      detect: 'detecting framework... <span class="terminal-success">vite</span>',
+      port: 'allocated port <span class="terminal-warning">3291</span>',
+      route: '<span class="terminal-success">route registered: </span><span class="terminal-command">myapp.localhost:1355</span>',
+      ready: '<span class="terminal-success">ready at http://myapp.localhost:1355</span>',
+    },
+    {
+      command: 'localias run --name api -- node server.js',
+      detect: 'detecting framework... <span class="terminal-success">node</span>',
+      port: 'allocated port <span class="terminal-warning">4102</span>',
+      route: '<span class="terminal-success">route registered: </span><span class="terminal-command">api.localhost:1355</span>',
+      ready: '<span class="terminal-success">ready at http://api.localhost:1355</span>',
+    },
+    {
+      command: 'localias compose -- docker compose up',
+      detect: 'parsing docker-compose.yml... <span class="terminal-success">3 services</span>',
+      port: 'allocated ports <span class="terminal-warning">3291, 4102, 5500</span>',
+      route: '<span class="terminal-success">routes: </span><span class="terminal-command">web, api, docs</span>',
+      ready: '<span class="terminal-success">all services ready on *.localhost:1355</span>',
+    },
+  ];
+
+  let scenarioIndex = 0;
+
+  function restartAnimations() {
+    const container = document.getElementById('hero-anim');
+    if (!container) return;
+
+    scenarioIndex = (scenarioIndex + 1) % scenarios.length;
+    const s = scenarios[scenarioIndex];
+
+    const parent = container.parentElement;
+    if (!parent) return;
+
+    const clone = container.cloneNode(true) as HTMLElement;
+    clone.id = 'hero-anim';
+
+    const typing = clone.querySelector('.anim-typing');
+    if (typing) typing.innerHTML = `<span class="terminal-prompt">$ </span><span class="terminal-command">${s.command}</span>`;
+
+    const found = clone.querySelector('.anim-found');
+    if (found) found.innerHTML = s.detect;
+
+    const port = clone.querySelector('.anim-port');
+    if (port) port.innerHTML = s.port;
+
+    const route = clone.querySelector('.anim-route');
+    if (route) route.innerHTML = s.route;
+
+    const ready = clone.querySelector('.anim-ready');
+    if (ready) ready.innerHTML = s.ready;
+
+    parent.replaceChild(clone, container);
+  }
+
+  // Respect prefers-reduced-motion
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setInterval(restartAnimations, 6000);
+  }
+
+  // Per-theme synonyms for the rotating hero word
+  const themeSynonyms: Record<string, string[]> = {
+    dark:      ['every dev service.', 'your entire stack.', 'local development.', 'zero config.', 'all your projects.', 'clean URLs.', 'instant proxying.', 'effortless routing.'],
+    light:     ['a cleaner workflow.', 'simple routing.', 'tidy dev URLs.', 'easy access.', 'clear hostnames.', 'clean dev.'],
+    blood:     ['ruthless efficiency.', 'no more port hell.', 'port annihilation.', 'total control.', 'brutal simplicity.', 'domain domination.'],
+    synthwave: ['retro-cool dev.', 'neon-powered dev.', 'turbo routing.', 'rad hostnames.', 'warp-speed dev.', 'full throttle.'],
+    matrix:    ['root-level access.', 'system override.', 'zero downtime.', 'network control.', 'full-stack proxy.', 'the chosen dev.'],
+    cyberpunk: ['augmented dev.', 'overclocked routing.', 'hardwired URLs.', 'neural-linked.', 'chrome-plated dev.', 'next-gen proxy.'],
+    gruvbox:   ['old-school dev.', 'warm & cozy URLs.', 'tried & true.', 'no-nonsense proxy.', 'back to basics.', 'simple & solid.'],
+    arctic:    ['crystal-clear URLs.', 'frosty-fresh dev.', 'sub-zero latency.', 'cool & collected.', 'ice-clean routing.', 'polar precision.'],
+    nebula:    ['cosmic dev.', 'stellar routing.', 'deep-space URLs.', 'interstellar proxy.', 'light-speed dev.', 'infinite scale.'],
+  };
+
+  function getThemeName(): string {
+    return document.documentElement.getAttribute('data-theme') || 'dark';
+  }
+
+  let synonyms = themeSynonyms[getThemeName()] || themeSynonyms.dark;
+  const rotatingWord = document.getElementById('hero-rotating-word');
+  if (rotatingWord && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let wordIndex = 0;
+    setInterval(() => {
+      rotatingWord.classList.remove('entering');
+      rotatingWord.classList.add('leaving');
+      setTimeout(() => {
+        wordIndex = (wordIndex + 1) % synonyms.length;
+        rotatingWord.textContent = synonyms[wordIndex];
+        rotatingWord.classList.remove('leaving');
+        rotatingWord.classList.add('entering');
+      }, 350);
+    }, 3000);
+
+    // On theme change, swap synonyms and show first word immediately
+    window.addEventListener('themechange', (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      const newTheme = detail?.theme || 'dark';
+      synonyms = themeSynonyms[newTheme] || themeSynonyms.dark;
+      wordIndex = 0;
+      rotatingWord.classList.remove('leaving');
+      rotatingWord.textContent = synonyms[0];
+      rotatingWord.classList.remove('entering');
+      void rotatingWord.offsetWidth;
+      rotatingWord.classList.add('entering');
+    });
+  }
+</script>

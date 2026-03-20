@@ -1,12 +1,12 @@
-import type { Result } from '../result.js'
-import { ok, err, isErr } from '../result.js'
-import type { IProxyServer } from '../ports/proxy-server.js'
-import type { IRouteRepository } from '../ports/route-repository.js'
 import type { ICertificateManager } from '../ports/certificate-manager.js'
-import type { IStateManager } from '../ports/state-manager.js'
 import type { IHostsManager } from '../ports/hosts-manager.js'
 import type { ILogger } from '../ports/logger.js'
 import type { IProcessManager } from '../ports/process-manager.js'
+import type { IProxyServer } from '../ports/proxy-server.js'
+import type { IRouteRepository } from '../ports/route-repository.js'
+import type { IStateManager } from '../ports/state-manager.js'
+import type { Result } from '../result.js'
+import { err, isErr, ok } from '../result.js'
 import { ProxyConfig } from '../values/proxy-config.js'
 
 export interface StartProxyDeps {
@@ -20,13 +20,13 @@ export interface StartProxyDeps {
 }
 
 export interface StartProxyParams {
-	readonly port?: number
-	readonly tls?: boolean
-	readonly tld?: string
-	readonly stateDir?: string
-	readonly certPath?: string
-	readonly keyPath?: string
-	readonly foreground?: boolean
+	readonly port?: number | undefined
+	readonly tls?: boolean | undefined
+	readonly tld?: string | undefined
+	readonly stateDir?: string | undefined
+	readonly certPath?: string | undefined
+	readonly keyPath?: string | undefined
+	readonly foreground?: boolean | undefined
 }
 
 export class StartProxyUseCase {
@@ -60,7 +60,11 @@ export class StartProxyUseCase {
 		}
 
 		// 4. Start server
-		const startResult = await this.deps.proxy.start(config, () => this.deps.routes.loadRoutes(), certInfo)
+		const startResult = await this.deps.proxy.start(
+			config,
+			() => this.deps.routes.loadRoutes(),
+			certInfo,
+		)
 		if (isErr(startResult)) return err(startResult.error)
 
 		// 5. Write state files

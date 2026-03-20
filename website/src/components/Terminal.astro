@@ -1,0 +1,20 @@
+---
+interface Props {
+  title?: string;
+  class?: string;
+}
+
+const { title = 'terminal', class: className = '' } = Astro.props;
+---
+
+<div class:list={['terminal', className]}>
+  <div class="terminal-header">
+    <span class="terminal-dot terminal-dot--red" aria-hidden="true"></span>
+    <span class="terminal-dot terminal-dot--yellow" aria-hidden="true"></span>
+    <span class="terminal-dot terminal-dot--green" aria-hidden="true"></span>
+    <span class="terminal-title">{title}</span>
+  </div>
+  <div class="terminal-body">
+    <slot />
+  </div>
+</div>
