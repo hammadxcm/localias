@@ -138,7 +138,7 @@ jobs:
           cat > tap/Formula/localias.rb << FORMULA
           class Localias < Formula
             desc "Stable .localhost URLs for every dev service"
-            homepage "https://localias.dev"
+            homepage "https://localias.fyniti.co.uk"
             version "${VERSION}"
             license "MIT"
 
