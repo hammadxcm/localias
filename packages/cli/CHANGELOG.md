@@ -1,5 +1,15 @@
 # localias
 
+## 0.0.4
+
+### Patch Changes
+
+- f27c5b4: Auto-start proxy when running localias run or compose
+- Updated dependencies [f27c5b4]
+  - @localias/core@0.0.4
+  - @localias/infra@0.0.4
+  - @localias/plugin-sdk@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @localias/core
 
+## 0.0.4
+
+### Patch Changes
+
+- f27c5b4: Auto-start proxy when running localias run or compose
+
 ## 0.0.3
 
 ### Patch Changes
