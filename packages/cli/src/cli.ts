@@ -1,0 +1,136 @@
+#!/usr/bin/env node
+
+import { createDefaultContainer } from '@publify/infra'
+import { registerBuiltInPlugins } from '@publify/plugin-sdk'
+import { ArgParser } from './parser.js'
+import { printHelp, printVersion } from './help.js'
+import { runCommand } from './commands/run.js'
+import { namedCommand } from './commands/named.js'
+import { proxyStartCommand } from './commands/proxy-start.js'
+import { proxyStopCommand } from './commands/proxy-stop.js'
+import { aliasCommand } from './commands/alias.js'
+import { listCommand } from './commands/list.js'
+import { getCommand } from './commands/get.js'
+import { trustCommand } from './commands/trust.js'
+import { hostsCommand } from './commands/hosts.js'
+
+async function main(): Promise<void> {
+	const argv = process.argv.slice(2)
+
+	// Block npx/pnpm dlx invocations
+	const execPath = process.env['npm_execpath'] ?? ''
+	if (execPath.includes('npx') || process.env['npm_command'] === 'exec') {
+		console.error('Error: publify should be installed globally, not run via npx.')
+		console.error('Install: npm install -g publify')
+		process.exitCode = 1
+		return
+	}
+
+	const parser = new ArgParser(argv)
+
+	// Global flags
+	if (parser.flag('help', 'h')) {
+		printHelp()
+		return
+	}
+	if (parser.flag('version', 'v')) {
+		printVersion()
+		return
+	}
+
+	// PUBLIFY=0 bypass
+	if (process.env['PUBLIFY'] === '0') {
+		const rest = parser.rest()
+		if (rest.length > 0) {
+			const container = createDefaultContainer()
+			container.process.spawn(rest, {})
+			return
+		}
+	}
+
+	// Named run mode via --name
+	const nameFlag = parser.option('name')
+	if (nameFlag) {
+		const container = createDefaultContainer()
+		registerBuiltInPlugins(container.plugins)
+		const rest = parser.rest()
+		await namedCommand(nameFlag, rest, container, {
+			force: parser.flag('force'),
+			appPort: parser.optionNumber('app-port'),
+			tld: parser.option('tld'),
+		})
+		return
+	}
+
+	const subcommand = parser.positional()
+
+	switch (subcommand) {
+		case 'run': {
+			const container = createDefaultContainer()
+			registerBuiltInPlugins(container.plugins)
+			await runCommand(parser, container)
+			break
+		}
+		case 'proxy': {
+			const proxyAction = parser.positional()
+			const container = createDefaultContainer()
+			if (proxyAction === 'start') {
+				await proxyStartCommand(parser, container)
+			} else if (proxyAction === 'stop') {
+				await proxyStopCommand(container)
+			} else {
+				console.error('Usage: publify proxy <start|stop>')
+				process.exitCode = 1
+			}
+			break
+		}
+		case 'alias': {
+			const container = createDefaultContainer()
+			aliasCommand(parser, container)
+			break
+		}
+		case 'list':
+		case 'ls': {
+			const container = createDefaultContainer()
+			await listCommand(container)
+			break
+		}
+		case 'get': {
+			const container = createDefaultContainer()
+			await getCommand(parser, container)
+			break
+		}
+		case 'trust': {
+			const container = createDefaultContainer()
+			await trustCommand(container)
+			break
+		}
+		case 'hosts': {
+			const hostsAction = parser.positional()
+			const container = createDefaultContainer()
+			hostsCommand(hostsAction, container)
+			break
+		}
+		default: {
+			// Default: first arg = app name → named run mode
+			if (subcommand && !subcommand.startsWith('-')) {
+				const container = createDefaultContainer()
+				registerBuiltInPlugins(container.plugins)
+				const rest = parser.rest()
+				await namedCommand(subcommand, rest, container, {
+					force: parser.flag('force'),
+					appPort: parser.optionNumber('app-port'),
+					tld: parser.option('tld'),
+				})
+			} else {
+				printHelp()
+			}
+			break
+		}
+	}
+}
+
+main().catch((e) => {
+	console.error(e)
+	process.exitCode = 1
+})

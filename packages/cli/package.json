@@ -1,0 +1,24 @@
+{
+  "name": "publify",
+  "version": "0.0.0",
+  "type": "module",
+  "bin": {
+    "publify": "./dist/cli.js"
+  },
+  "main": "./dist/cli.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src/"
+  },
+  "dependencies": {
+    "@publify/core": "workspace:*",
+    "@publify/infra": "workspace:*",
+    "@publify/plugin-sdk": "workspace:*",
+    "chalk": "^5.4.1"
+  },
+  "devDependencies": {
+    "vitest": "^3.1.1"
+  }
+}

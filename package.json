@@ -1,0 +1,17 @@
+{
+  "name": "publify",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.7.0",
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "2.4.4",
+    "@biomejs/biome": "1.9.4",
+    "typescript": "5.8.3"
+  }
+}
