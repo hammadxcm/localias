@@ -1,0 +1,7 @@
+# @localias/core
+
+## 0.0.2
+
+### Patch Changes
+
+- c3481b2: Initial public release
