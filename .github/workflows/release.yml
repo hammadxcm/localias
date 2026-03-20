@@ -112,11 +112,10 @@ jobs:
     needs: github-release
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v5
       - name: Get CLI version
         id: version
         run: echo "version=$(node -p "require('./packages/cli/package.json').version")" >> "$GITHUB_OUTPUT"
-        working-directory: ${{ github.workspace }}
-      - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
         with:
           path: artifacts
