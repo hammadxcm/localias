@@ -1,6 +1,11 @@
 {
   "name": "@localias/infra",
   "version": "0.0.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hammadxcm/localias",
+    "directory": "packages/infra"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
