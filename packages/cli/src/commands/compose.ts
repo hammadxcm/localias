@@ -1,6 +1,7 @@
 import { isErr } from '@localias/core'
 import type { Container } from '@localias/infra'
 import type { ArgParser } from '../parser.js'
+import { ensureProxy } from './ensure-proxy.js'
 
 export async function composeCommand(parser: ArgParser, container: Container): Promise<void> {
 	const name = parser.option('name')
@@ -13,6 +14,8 @@ export async function composeCommand(parser: ArgParser, container: Container): P
 		process.exitCode = 1
 		return
 	}
+
+	await ensureProxy(container)
 
 	const result = await container.runCompose.execute({
 		command,
