@@ -78,7 +78,7 @@ jobs:
       - run: pnpm build
       - name: Compile binary
         run: bun build packages/cli/src/cli.ts --compile --target=${{ matrix.target }} --outfile ${{ matrix.artifact }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.artifact }}
           path: ${{ matrix.artifact }}
@@ -91,7 +91,7 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           path: artifacts
           merge-multiple: true
@@ -117,7 +117,7 @@ jobs:
         run: echo "version=$(node -p "require('./packages/cli/package.json').version")" >> "$GITHUB_OUTPUT"
         working-directory: ${{ github.workspace }}
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           path: artifacts
           merge-multiple: true
