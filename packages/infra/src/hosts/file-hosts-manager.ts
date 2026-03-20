@@ -1,12 +1,13 @@
-import { readFileSync, writeFileSync } from 'node:fs'
 import dns from 'node:dns'
-import type { IHostsManager } from '@publify/core'
-import type { Result } from '@publify/core'
-import { ok, err } from '@publify/core'
+import { readFileSync, writeFileSync } from 'node:fs'
+import type { IHostsManager } from '@localias/core'
+import type { Result } from '@localias/core'
+import { err, ok } from '@localias/core'
 
-const HOSTS_PATH = process.platform === 'win32' ? 'C:\\Windows\\System32\\drivers\\etc\\hosts' : '/etc/hosts'
-const MARKER_START = '# publify-start'
-const MARKER_END = '# publify-end'
+const HOSTS_PATH =
+	process.platform === 'win32' ? 'C:\\Windows\\System32\\drivers\\etc\\hosts' : '/etc/hosts'
+const MARKER_START = '# localias-start'
+const MARKER_END = '# localias-end'
 
 export class FileHostsManager implements IHostsManager {
 	sync(hostnames: string[]): Result<void, Error> {
@@ -17,7 +18,11 @@ export class FileHostsManager implements IHostsManager {
 			writeFileSync(HOSTS_PATH, cleaned + block, 'utf-8')
 			return ok(undefined)
 		} catch (e) {
-			return err(new Error(`Failed to update ${HOSTS_PATH}: ${(e as Error).message}. Try running with sudo.`))
+			return err(
+				new Error(
+					`Failed to update ${HOSTS_PATH}: ${(e as Error).message}. Try running with sudo.`,
+				),
+			)
 		}
 	}
 
@@ -28,7 +33,11 @@ export class FileHostsManager implements IHostsManager {
 			writeFileSync(HOSTS_PATH, cleaned, 'utf-8')
 			return ok(undefined)
 		} catch (e) {
-			return err(new Error(`Failed to update ${HOSTS_PATH}: ${(e as Error).message}. Try running with sudo.`))
+			return err(
+				new Error(
+					`Failed to update ${HOSTS_PATH}: ${(e as Error).message}. Try running with sudo.`,
+				),
+			)
 		}
 	}
 
@@ -82,6 +91,6 @@ export class FileHostsManager implements IHostsManager {
 			lines.push(`127.0.0.1 ${h}`)
 		}
 		lines.push(MARKER_END)
-		return '\n' + lines.join('\n') + '\n'
+		return `\n${lines.join('\n')}\n`
 	}
 }

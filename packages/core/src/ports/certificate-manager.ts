@@ -1,6 +1,6 @@
+import type { CertificateError } from '../errors.js'
 import type { Result } from '../result.js'
 import type { CertificateInfo } from '../values/certificate-info.js'
-import type { CertificateError } from '../errors.js'
 
 export type SNICallback = (
 	servername: string,

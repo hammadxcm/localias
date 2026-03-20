@@ -1,6 +1,6 @@
-import type { Result } from '../result.js'
-import { ok, err } from '../result.js'
 import { HostnameValidationError } from '../errors.js'
+import type { Result } from '../result.js'
+import { err, ok } from '../result.js'
 
 const LABEL_MAX = 63
 const NAME_MAX = 253
@@ -18,8 +18,11 @@ export class Hostname {
 	}
 
 	static create(input: string, tld = 'localhost'): Result<Hostname, HostnameValidationError> {
-		let cleaned = input.replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/:\d+$/, '')
-		cleaned = cleaned.toLowerCase().trim()
+		let cleaned = input.trim().toLowerCase()
+		cleaned = cleaned
+			.replace(/^https?:\/\//, '')
+			.replace(/\/.*$/, '')
+			.replace(/:\d+$/, '')
 
 		if (!cleaned) {
 			return err(new HostnameValidationError(input, 'empty hostname'))
@@ -39,10 +42,14 @@ export class Hostname {
 				return err(new HostnameValidationError(input, 'empty label'))
 			}
 			if (label.length > LABEL_MAX) {
-				return err(new HostnameValidationError(input, `label "${label}" exceeds ${LABEL_MAX} characters`))
+				return err(
+					new HostnameValidationError(input, `label "${label}" exceeds ${LABEL_MAX} characters`),
+				)
 			}
 			if (!LABEL_RE.test(label)) {
-				return err(new HostnameValidationError(input, `label "${label}" contains invalid characters`))
+				return err(
+					new HostnameValidationError(input, `label "${label}" contains invalid characters`),
+				)
 			}
 		}
 

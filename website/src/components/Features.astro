@@ -1,0 +1,283 @@
+---
+const features = [
+  {
+    id: 'urls',
+    cmd: 'myapp.localhost:1355',
+    title: 'Stable URLs',
+    description: 'Every project gets a memorable .localhost hostname that never changes, even across reboots.',
+    color: 'var(--cyan)',
+  },
+  {
+    id: 'auto-port',
+    cmd: 'localias run',
+    title: 'Auto Port Allocation',
+    description: 'Ports are assigned automatically. No collisions, no manual configuration needed.',
+    color: 'var(--yellow)',
+  },
+  {
+    id: 'framework',
+    cmd: 'framework: vite',
+    title: 'Framework Detection',
+    description: 'Detects Vite, Next.js, Nuxt, Angular, SvelteKit, and Astro. Injects the right flags automatically.',
+    color: 'var(--green)',
+  },
+  {
+    id: 'compose',
+    cmd: 'localias compose -- docker compose up',
+    title: 'Docker Compose',
+    description: 'Wrap docker compose to auto-discover services, allocate ports, inject env vars, and register .localhost routes for every service.',
+    color: 'var(--red)',
+  },
+  {
+    id: 'tls',
+    cmd: 'localias proxy start --https',
+    title: 'TLS / HTTPS',
+    description: 'Generate and trust local certificates. Access services over HTTPS with zero effort.',
+    color: 'var(--cyan)',
+  },
+  {
+    id: 'worktree',
+    cmd: 'feat-auth.myapp.localhost',
+    title: 'Git Worktree Support',
+    description: 'Branch names become URL prefixes. Review branches side-by-side in the browser.',
+    color: 'var(--yellow)',
+  },
+  {
+    id: 'hot-reload',
+    cmd: 'watching...',
+    title: 'Hot Reload Aware',
+    description: 'Proxied services maintain hot reload and WebSocket connections transparently.',
+    color: 'var(--green)',
+  },
+  {
+    id: 'cleanup',
+    cmd: 'stale route pruned',
+    title: 'Stale Cleanup',
+    description: 'Orphaned routes are detected and removed automatically. No manual housekeeping.',
+    color: 'var(--red)',
+  },
+  {
+    id: 'alias',
+    cmd: 'localias alias set',
+    title: 'Custom Aliases',
+    description: 'Map any .localhost hostname to any service. Create shortcuts for frequently used routes.',
+    color: 'var(--cyan)',
+  },
+  {
+    id: 'hosts',
+    cmd: '/etc/hosts synced',
+    title: 'Hosts File Sync',
+    description: 'Optionally sync routes to /etc/hosts for system-wide resolution beyond the browser.',
+    color: 'var(--yellow)',
+  },
+  {
+    id: 'sdk',
+    cmd: '@localias/plugin-sdk',
+    title: 'Plugin SDK',
+    description: 'Extend framework support with a typed plugin interface. Build custom integrations.',
+    color: 'var(--green)',
+  },
+  {
+    id: 'arch',
+    cmd: 'clean architecture',
+    title: 'Clean Architecture',
+    description: 'Hexagonal design with zero coupling. Core has no Node.js imports. Everything is testable.',
+    color: 'var(--red)',
+  },
+];
+
+const icons: Record<string, string> = {
+  urls: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
+  'auto-port': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+  framework: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="15.5"/><polyline points="22 8.5 12 15.5 2 8.5"/></svg>`,
+  compose: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+  tls: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+  worktree: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>`,
+  'hot-reload': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+  cleanup: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>`,
+  alias: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h10l6 8-6 8H4l6-8z"/><circle cx="9" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>`,
+  hosts: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
+  sdk: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H6a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2 2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2"/><path d="M16 3h2a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2 2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2"/></svg>`,
+  arch: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`,
+};
+---
+
+<section class="section" id="features">
+  <div class="container">
+    <h2 class="section-title reveal">Why <span class="gradient-text">localias</span>?</h2>
+    <p class="section-subtitle reveal">Everything you need for painless local development routing.</p>
+    <div class="features-grid">
+      {
+        features.map((f, i) => (
+          <div class="feature-card reveal" style={`--accent: ${f.color}; --delay: ${i * 0.06}s`}>
+            <div class={`feature-icon feature-icon--${f.id}`} aria-hidden="true" set:html={icons[f.id]} />
+            <h3 class="feature-title">{f.title}</h3>
+            <p class="feature-description">{f.description}</p>
+            <span class="feature-cmd">{f.cmd}</span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .feature-card {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 28px;
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px var(--card-shadow), 0 0 0 1px var(--accent), 0 0 30px color-mix(in srgb, var(--accent) 15%, transparent);
+    border-color: var(--accent);
+  }
+
+  .feature-card:hover .feature-icon {
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 10%, transparent);
+    will-change: transform;
+  }
+
+  .feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: var(--icon-bg);
+    color: var(--accent);
+    margin-bottom: 16px;
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+
+  .feature-icon :global(svg) {
+    width: 26px;
+    height: 26px;
+  }
+
+  .feature-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .feature-description {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .feature-cmd {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s, transform 0.3s;
+    margin-top: 12px;
+  }
+
+  .feature-card:hover .feature-cmd {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+
+  @keyframes icon-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  @keyframes icon-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes icon-bounce {
+    0%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-3px); }
+    60% { transform: translateY(1px); }
+  }
+
+  .feature-card:hover .feature-icon--urls :global(svg) {
+    animation: icon-pulse 0.8s ease-in-out infinite;
+  }
+
+  .feature-card:hover .feature-icon--auto-port :global(svg) {
+    animation: icon-rotate 1.2s linear infinite;
+  }
+
+  .feature-card:hover .feature-icon--framework :global(svg) {
+    animation: icon-bounce 0.6s ease-in-out infinite;
+  }
+
+  .feature-card:hover .feature-icon--tls :global(svg) {
+    animation: icon-pulse 0.8s ease-in-out infinite;
+  }
+
+  .feature-card:hover .feature-icon--worktree :global(svg) {
+    animation: icon-rotate 3s linear infinite;
+  }
+
+  .feature-card:hover .feature-icon--hot-reload :global(svg) {
+    animation: icon-bounce 0.6s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [class*="feature-icon--"] :global(svg),
+    [class*="feature-icon--"] :global(svg *) {
+      animation: none !important;
+    }
+    .feature-cmd {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .features-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .features-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .feature-card {
+      padding: 20px;
+    }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+    }
+
+    .feature-icon :global(svg) {
+      width: 24px;
+      height: 24px;
+    }
+
+    .feature-cmd {
+      opacity: 0.5;
+      transform: translateY(0);
+    }
+  }
+</style>

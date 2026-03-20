@@ -1,5 +1,5 @@
-import type { Container } from '@publify/infra'
-import { isErr } from '@publify/core'
+import { isErr } from '@localias/core'
+import type { Container } from '@localias/infra'
 
 export async function listCommand(container: Container): Promise<void> {
 	const result = await container.listRoutes.execute()
@@ -27,9 +27,7 @@ export async function listCommand(container: Container): Promise<void> {
 	])
 
 	// Calculate column widths
-	const widths = header.map((h, i) =>
-		Math.max(h.length, ...rows.map((row) => row[i]!.length)),
-	)
+	const widths = header.map((h, i) => Math.max(h.length, ...rows.map((row) => row[i]?.length ?? 0)))
 
 	const pad = (s: string, w: number) => s.padEnd(w)
 	const separator = widths.map((w) => '-'.repeat(w)).join('  ')

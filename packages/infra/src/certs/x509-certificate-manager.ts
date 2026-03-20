@@ -1,23 +1,21 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import type { ICertificateManager, SNICallback, CertificateInfo } from '@publify/core'
-import type { Result } from '@publify/core'
-import { ok, err, CertificateInfo as CertInfo, CertificateError } from '@publify/core'
+import tls from 'node:tls'
+import type { CertificateInfo, ICertificateManager, SNICallback } from '@localias/core'
+import type { Result } from '@localias/core'
+import { CertificateInfo as CertInfo, CertificateError, err, ok } from '@localias/core'
 
+import { webcrypto } from 'node:crypto'
 // We'll use @peculiar/x509 for cert generation
 import * as x509 from '@peculiar/x509'
-import { Crypto } from '@peculiar/webcrypto'
 
-const crypto = new Crypto()
-x509.cryptoProvider.set(crypto as any)
+x509.cryptoProvider.set(webcrypto as any)
 
 const CA_CERT_FILE = 'ca.crt'
 const CA_KEY_FILE = 'ca.key'
 const CERT_DIR = 'certs'
 const KEY_ALGORITHM = { name: 'ECDSA', namedCurve: 'P-256' }
 const SIGN_ALGORITHM = { name: 'ECDSA', hash: 'SHA-256' }
-const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000
-
 export class X509CertificateManager implements ICertificateManager {
 	private readonly sniCache = new Map<string, Promise<{ cert: string; key: string }>>()
 
@@ -81,19 +79,14 @@ export class X509CertificateManager implements ICertificateManager {
 		const caKeyPath = join(certDir, CA_KEY_FILE)
 
 		return (servername, cb) => {
-			const getCert = this.sniCache.get(servername) ?? this.generateAndCache(
-				servername,
-				caPath,
-				caKeyPath,
-				certDir,
-				tld,
-			)
+			const getCert =
+				this.sniCache.get(servername) ??
+				this.generateAndCache(servername, caPath, caKeyPath, certDir, tld)
 
 			getCert
 				.then(({ cert, key }) => {
-					// The caller (NodeProxyServer) will need to create the SecureContext
-					// For now we store paths and let the server handle it
-					cb(null, { cert, key } as any)
+					const ctx = tls.createSecureContext({ cert, key })
+					cb(null, ctx)
 				})
 				.catch((e) => cb(e as Error))
 		}
@@ -106,9 +99,11 @@ export class X509CertificateManager implements ICertificateManager {
 		certDir: string,
 		_tld: string,
 	): Promise<{ cert: string; key: string }> {
+		// Sanitize servername to prevent path traversal
+		const safeName = servername.replace(/[^a-zA-Z0-9.-]/g, '_')
 		const promise = (async () => {
-			const certPath = join(certDir, `${servername}.crt`)
-			const keyPath = join(certDir, `${servername}.key`)
+			const certPath = join(certDir, `${safeName}.crt`)
+			const keyPath = join(certDir, `${safeName}.key`)
 
 			if (existsSync(certPath) && existsSync(keyPath)) {
 				return {
@@ -124,16 +119,24 @@ export class X509CertificateManager implements ICertificateManager {
 			}
 		})()
 
+		// Don't cache failures
+		promise.catch(() => {
+			this.sniCache.delete(servername)
+		})
+
 		this.sniCache.set(servername, promise)
 		return promise
 	}
 
 	private async generateCA(caPath: string, caKeyPath: string): Promise<void> {
-		const keys = await crypto.subtle.generateKey(KEY_ALGORITHM, true, ['sign', 'verify']) as CryptoKeyPair
+		const keys = (await webcrypto.subtle.generateKey(KEY_ALGORITHM, true, [
+			'sign',
+			'verify',
+		])) as unknown as CryptoKeyPair
 
 		const cert = await x509.X509CertificateGenerator.createSelfSigned({
 			serialNumber: this.randomSerial(),
-			name: 'CN=Publify Local CA',
+			name: 'CN=Localias Local CA',
 			notBefore: new Date(),
 			notAfter: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
 			keys,
@@ -148,7 +151,10 @@ export class X509CertificateManager implements ICertificateManager {
 		})
 
 		writeFileSync(caPath, cert.toString('pem'), 'utf-8')
-		const exported = await crypto.subtle.exportKey('pkcs8', keys.privateKey)
+		const exported = await webcrypto.subtle.exportKey(
+			'pkcs8',
+			keys.privateKey as unknown as webcrypto.CryptoKey,
+		)
 		const pem = this.toPem(exported, 'PRIVATE KEY')
 		writeFileSync(caKeyPath, pem, 'utf-8')
 	}
@@ -162,9 +168,12 @@ export class X509CertificateManager implements ICertificateManager {
 	): Promise<void> {
 		const caCert = new x509.X509Certificate(readFileSync(caPath, 'utf-8'))
 		const caKeyPem = readFileSync(caKeyPath, 'utf-8')
-		const caKey = await this.importPrivateKey(caKeyPem)
+		const caKey = (await this.importPrivateKey(caKeyPem)) as unknown as CryptoKey
 
-		const keys = await crypto.subtle.generateKey(KEY_ALGORITHM, true, ['sign', 'verify']) as CryptoKeyPair
+		const keys = (await webcrypto.subtle.generateKey(KEY_ALGORITHM, true, [
+			'sign',
+			'verify',
+		])) as unknown as CryptoKeyPair
 
 		const sans = [hostname]
 		if (!hostname.startsWith('*.')) {
@@ -190,28 +199,37 @@ export class X509CertificateManager implements ICertificateManager {
 		})
 
 		writeFileSync(certPath, cert.toString('pem'), 'utf-8')
-		const exported = await crypto.subtle.exportKey('pkcs8', keys.privateKey)
+		const exported = await webcrypto.subtle.exportKey(
+			'pkcs8',
+			keys.privateKey as unknown as webcrypto.CryptoKey,
+		)
 		writeFileSync(keyPath, this.toPem(exported, 'PRIVATE KEY'), 'utf-8')
 	}
 
-	private async importPrivateKey(pem: string): Promise<CryptoKey> {
+	private async importPrivateKey(pem: string): Promise<webcrypto.CryptoKey> {
 		const b64 = pem
 			.replace(/-----BEGIN PRIVATE KEY-----/, '')
 			.replace(/-----END PRIVATE KEY-----/, '')
 			.replace(/\s/g, '')
 		const binary = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))
-		return crypto.subtle.importKey('pkcs8', binary, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign'])
+		return webcrypto.subtle.importKey(
+			'pkcs8',
+			binary,
+			{ name: 'ECDSA', namedCurve: 'P-256' },
+			false,
+			['sign'],
+		)
 	}
 
 	private toPem(buffer: ArrayBuffer, label: string): string {
-		const b64 = btoa(String.fromCharCode(...new Uint8Array(buffer)))
+		const b64 = Buffer.from(buffer).toString('base64')
 		const lines = b64.match(/.{1,64}/g) ?? []
 		return `-----BEGIN ${label}-----\n${lines.join('\n')}\n-----END ${label}-----\n`
 	}
 
 	private randomSerial(): string {
 		const bytes = new Uint8Array(16)
-		crypto.getRandomValues(bytes)
+		webcrypto.getRandomValues(bytes)
 		return Array.from(bytes)
 			.map((b) => b.toString(16).padStart(2, '0'))
 			.join('')

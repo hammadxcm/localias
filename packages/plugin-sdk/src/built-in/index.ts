@@ -1,10 +1,10 @@
-import type { PluginRegistry } from '@publify/core'
-import { vitePlugin } from './vite.js'
-import { reactRouterPlugin } from './react-router.js'
-import { astroPlugin } from './astro.js'
+import type { PluginRegistry } from '@localias/core'
 import { angularPlugin } from './angular.js'
-import { reactNativePlugin } from './react-native.js'
+import { astroPlugin } from './astro.js'
 import { expoPlugin } from './expo.js'
+import { reactNativePlugin } from './react-native.js'
+import { reactRouterPlugin } from './react-router.js'
+import { vitePlugin } from './vite.js'
 
 export const builtInPlugins = [
 	vitePlugin,

@@ -1,7 +1,7 @@
-import type { Result } from '../result.js'
-import { ok, err, isErr } from '../result.js'
-import type { IRouteRepository } from '../ports/route-repository.js'
 import type { ILogger } from '../ports/logger.js'
+import type { IRouteRepository } from '../ports/route-repository.js'
+import type { Result } from '../result.js'
+import { err, isErr, ok } from '../result.js'
 
 export interface RemoveAliasDeps {
 	readonly routes: IRouteRepository
@@ -12,8 +12,11 @@ export class RemoveAliasUseCase {
 	constructor(private readonly deps: RemoveAliasDeps) {}
 
 	execute(name: string): Result<void, Error> {
+		const normalized = name.toLowerCase()
 		const routes = this.deps.routes.loadRoutes()
-		const route = routes.find((r) => r.hostname.value === name || r.hostname.name === name)
+		const route = routes.find(
+			(r) => r.hostname.value === normalized || r.hostname.name === normalized,
+		)
 
 		if (!route) {
 			return err(new Error(`No route found for "${name}"`))

@@ -1,0 +1,322 @@
+---
+import Logo from './Logo.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+const links = [
+  { label: 'Features', href: '#features' },
+  { label: 'Install', href: '#install' },
+  { label: 'Demos', href: '#demos' },
+  { label: 'How It Works', href: '#how-it-works' },
+];
+---
+
+<nav class="navbar" id="navbar">
+  <div class="navbar-inner container">
+    <a href="/" class="navbar-brand" aria-label="localias home">
+      <Logo />
+      <span class="brand-text">localias</span>
+    </a>
+
+    <button class="hamburger" id="hamburger" type="button" aria-label="Toggle menu" aria-expanded="false">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+
+    <div class="navbar-links" id="navbar-links" aria-hidden="true">
+      {links.map((link) => <a href={link.href} class="nav-link">{link.label}</a>)}
+      <div class="navbar-actions">
+        <ThemeToggle />
+        <a
+          href="https://github.com/hammadxcm/localias"
+          class="nav-link nav-link--github"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub<span class="sr-only">(opens in new tab)</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: var(--nav-height);
+    background: var(--nav-bg);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.3s, backdrop-filter 0.3s, box-shadow 0.3s;
+  }
+
+  .navbar.scrolled {
+    background: var(--nav-bg-scrolled);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 1px 20px var(--card-shadow);
+  }
+
+  .navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--text);
+  }
+
+  .navbar-brand:hover {
+    opacity: 1;
+  }
+
+  .brand-text {
+    letter-spacing: -0.02em;
+  }
+
+  .navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .nav-link {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .nav-link:hover {
+    color: var(--text);
+    opacity: 1;
+  }
+
+  .nav-link.active {
+    color: var(--text);
+  }
+
+  .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--red);
+    border-radius: 1px;
+  }
+
+  .nav-link--github {
+    padding: 6px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+  }
+
+  .nav-link--github:hover {
+    border-color: var(--text-muted);
+  }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .hamburger-line {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s;
+  }
+
+  .hamburger.is-open .hamburger-line:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .hamburger.is-open .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.is-open .hamburger-line:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  @media (max-width: 768px) {
+    .hamburger {
+      display: flex;
+    }
+
+    .navbar-links {
+      position: absolute;
+      top: var(--nav-height);
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      gap: 0;
+      background: var(--nav-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      padding: 0 24px;
+    }
+
+    .navbar-links.is-open {
+      max-height: 400px;
+      padding: 16px 24px;
+    }
+
+    .nav-link.active::after {
+      display: none;
+    }
+
+    .nav-link {
+      width: 100%;
+      padding: 12px 0;
+      font-size: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-link:last-child {
+      border-bottom: none;
+    }
+
+    .navbar-actions {
+      width: 100%;
+      padding: 16px 0 8px;
+      justify-content: flex-start;
+      gap: 16px;
+    }
+  }
+</style>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navbar-links');
+
+  function isMobileMenu() {
+    return window.matchMedia('(max-width: 768px)').matches;
+  }
+
+  function closeMenu() {
+    hamburger?.classList.remove('is-open');
+    navLinks?.classList.remove('is-open');
+    hamburger?.setAttribute('aria-expanded', 'false');
+    if (isMobileMenu()) {
+      navLinks?.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  hamburger?.addEventListener('click', () => {
+    const open = hamburger.classList.toggle('is-open');
+    navLinks?.classList.toggle('is-open');
+    hamburger.setAttribute('aria-expanded', String(open));
+    navLinks?.setAttribute('aria-hidden', String(!open));
+  });
+
+  // Escape key closes menu
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && hamburger?.classList.contains('is-open')) {
+      closeMenu();
+      hamburger?.focus();
+    }
+  });
+
+  // Focus trap within mobile menu
+  navLinks?.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab' || !hamburger?.classList.contains('is-open')) return;
+    const focusable = [
+      hamburger,
+      ...Array.from(navLinks.querySelectorAll('a, button'))
+    ].filter((el): el is HTMLElement => el instanceof HTMLElement);
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last?.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first?.focus();
+    }
+  });
+
+  // Close mobile menu when clicking a nav link
+  navLinks?.querySelectorAll('.nav-link').forEach((link) => {
+    link.addEventListener('click', () => closeMenu());
+  });
+
+  // Update aria-hidden when resizing past breakpoint
+  window.matchMedia('(max-width: 768px)').addEventListener('change', (e) => {
+    if (!e.matches) {
+      navLinks?.setAttribute('aria-hidden', 'false');
+    } else if (!hamburger?.classList.contains('is-open')) {
+      navLinks?.setAttribute('aria-hidden', 'true');
+    }
+  });
+
+  // On desktop, remove aria-hidden
+  if (!isMobileMenu()) {
+    navLinks?.setAttribute('aria-hidden', 'false');
+  }
+
+  // Scroll-aware navbar
+  const navbar = document.getElementById('navbar');
+  let navTicking = false;
+  window.addEventListener('scroll', () => {
+    if (!navTicking) {
+      requestAnimationFrame(() => {
+        navbar?.classList.toggle('scrolled', window.scrollY > 50);
+        navTicking = false;
+      });
+      navTicking = true;
+    }
+  });
+
+  // Active section indicator
+  const sections = document.querySelectorAll<HTMLElement>('section[id]');
+  const sectionLinks = navLinks?.querySelectorAll<HTMLAnchorElement>('a.nav-link[href^="#"]') ?? [];
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          for (const link of sectionLinks) {
+            link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+          }
+        }
+      }
+    },
+    { rootMargin: '-20% 0px -60% 0px' },
+  );
+  for (const section of sections) sectionObserver.observe(section);
+</script>

@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+import { ProxyConfig } from '../values/proxy-config.js'
 import { MiddlewarePipeline } from './pipeline.js'
 import type { ProxyContext } from './types.js'
-import { ProxyConfig } from '../values/proxy-config.js'
 
 function createMockContext(headers: Record<string, string> = {}): ProxyContext {
 	const responseHeaders: Record<string, string | string[]> = {}
@@ -14,7 +14,9 @@ function createMockContext(headers: Record<string, string> = {}): ProxyContext {
 		},
 		response: {
 			statusCode: 200,
-			setHeader: (name, value) => { responseHeaders[name] = value },
+			setHeader: (name, value) => {
+				responseHeaders[name] = value
+			},
 			end: () => {},
 			headersSent: false,
 		},
@@ -29,8 +31,16 @@ describe('MiddlewarePipeline', () => {
 		const order: number[] = []
 		const pipeline = new MiddlewarePipeline()
 
-		pipeline.use(async (_ctx, next) => { order.push(1); await next(); order.push(4) })
-		pipeline.use(async (_ctx, next) => { order.push(2); await next(); order.push(3) })
+		pipeline.use(async (_ctx, next) => {
+			order.push(1)
+			await next()
+			order.push(4)
+		})
+		pipeline.use(async (_ctx, next) => {
+			order.push(2)
+			await next()
+			order.push(3)
+		})
 
 		await pipeline.execute(createMockContext())
 		expect(order).toEqual([1, 2, 3, 4])
@@ -40,8 +50,12 @@ describe('MiddlewarePipeline', () => {
 		const order: number[] = []
 		const pipeline = new MiddlewarePipeline()
 
-		pipeline.use(async (_ctx, _next) => { order.push(1) })
-		pipeline.use(async (_ctx, _next) => { order.push(2) })
+		pipeline.use(async (_ctx, _next) => {
+			order.push(1)
+		})
+		pipeline.use(async (_ctx, _next) => {
+			order.push(2)
+		})
 
 		await pipeline.execute(createMockContext())
 		expect(order).toEqual([1])
@@ -49,8 +63,13 @@ describe('MiddlewarePipeline', () => {
 
 	it('throws on double next call', async () => {
 		const pipeline = new MiddlewarePipeline()
-		pipeline.use(async (_ctx, next) => { await next(); await next() })
+		pipeline.use(async (_ctx, next) => {
+			await next()
+			await next()
+		})
 
-		await expect(pipeline.execute(createMockContext())).rejects.toThrow('next() called multiple times')
+		await expect(pipeline.execute(createMockContext())).rejects.toThrow(
+			'next() called multiple times',
+		)
 	})
 })

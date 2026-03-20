@@ -6,6 +6,9 @@ export class ProcessId {
 	}
 
 	static create(pid: number): ProcessId {
+		if (!Number.isInteger(pid) || pid < 0) {
+			throw new RangeError(`Invalid PID: ${pid}`)
+		}
 		return new ProcessId(pid)
 	}
 }

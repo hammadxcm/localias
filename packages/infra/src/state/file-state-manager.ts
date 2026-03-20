@@ -1,23 +1,23 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs'
-import { join } from 'node:path'
-import { homedir, tmpdir } from 'node:os'
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import http from 'node:http'
-import type { IStateManager, ProxyState, Port, ProcessId } from '@publify/core'
-import { Port as PortVO, ProcessId as PidVO } from '@publify/core'
-import { isOk } from '@publify/core'
+import { homedir, tmpdir } from 'node:os'
+import { join } from 'node:path'
+import type { IStateManager, Port, ProcessId, ProxyState } from '@localias/core'
+import { ProcessId as PidVO, Port as PortVO } from '@localias/core'
+import { isOk } from '@localias/core'
 
 const WELL_KNOWN_PORTS = [1355, 443, 80]
 
 function defaultStateDir(): string {
-	const envDir = process.env['PUBLIFY_STATE_DIR']
+	const envDir = process.env.LOCALIAS_STATE_DIR
 	if (envDir) return envDir
-	// Prefer /tmp/publify for shared access, fallback to ~/.publify
-	const tmpPath = join(tmpdir(), 'publify')
+	// Prefer /tmp/localias for shared access, fallback to ~/.localias
+	const tmpPath = join(tmpdir(), 'localias')
 	try {
 		mkdirSync(tmpPath, { recursive: true, mode: 0o1777 })
 		return tmpPath
 	} catch {
-		const homePath = join(homedir(), '.publify')
+		const homePath = join(homedir(), '.localias')
 		mkdirSync(homePath, { recursive: true, mode: 0o755 })
 		return homePath
 	}
@@ -38,12 +38,13 @@ export class FileStateManager implements IStateManager {
 			const dir = join(base, String(port))
 			const pid = this.readProxyPid(dir)
 			if (pid && pid.value > 0) {
-				// Verify it's actually a publify proxy via HTTP HEAD
+				// Verify it's actually a localias proxy via HTTP HEAD
 				const isProxy = await this.probeProxy(port)
 				if (isProxy) {
+					const portResult = PortVO.create(port)
 					return {
 						running: true,
-						port: isOk(PortVO.create(port)) ? (PortVO.create(port) as any).value : null,
+						port: isOk(portResult) ? portResult.value : null,
 						pid,
 						tls: this.readTlsMarker(dir),
 						tld: this.readTld(dir),
@@ -66,7 +67,7 @@ export class FileStateManager implements IStateManager {
 	readProxyPid(stateDir: string): ProcessId | null {
 		try {
 			const content = readFileSync(join(stateDir, 'proxy.pid'), 'utf-8').trim()
-			const pid = parseInt(content, 10)
+			const pid = Number.parseInt(content, 10)
 			if (Number.isNaN(pid) || pid <= 0) return null
 			return PidVO.create(pid)
 		} catch {
@@ -82,7 +83,7 @@ export class FileStateManager implements IStateManager {
 	readProxyPort(stateDir: string): Port | null {
 		try {
 			const content = readFileSync(join(stateDir, 'proxy.port'), 'utf-8').trim()
-			const port = parseInt(content, 10)
+			const port = Number.parseInt(content, 10)
 			const result = PortVO.create(port)
 			return result._tag === 'Ok' ? result.value : null
 		} catch {
@@ -105,7 +106,11 @@ export class FileStateManager implements IStateManager {
 		if (enabled) {
 			writeFileSync(marker, '1', 'utf-8')
 		} else {
-			try { rmSync(marker) } catch { /* ignore */ }
+			try {
+				rmSync(marker)
+			} catch {
+				/* ignore */
+			}
 		}
 	}
 
@@ -127,7 +132,7 @@ export class FileStateManager implements IStateManager {
 			const req = http.request(
 				{ hostname: '127.0.0.1', port, method: 'HEAD', path: '/', timeout: 500 },
 				(res) => {
-					resolve(res.headers['x-publify'] === '1')
+					resolve(res.headers['x-localias'] === '1')
 				},
 			)
 			req.on('error', () => resolve(false))

@@ -1,18 +1,18 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync, rmdirSync, watch } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, rmdirSync, watch, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import type { IRouteRepository, Disposable, IProcessManager } from '@publify/core'
+import type { Disposable, IProcessManager, IRouteRepository } from '@localias/core'
 import {
-	type Result,
-	ok,
-	err,
-	isOk,
-	Route,
 	Hostname,
+	LockAcquisitionError,
 	Port,
 	ProcessId,
+	type Result,
+	Route,
 	RouteConflictError,
-	LockAcquisitionError,
-} from '@publify/core'
+	err,
+	isOk,
+	ok,
+} from '@localias/core'
 
 interface StoredRoute {
 	hostname: string
@@ -22,10 +22,6 @@ interface StoredRoute {
 
 const LOCK_RETRIES = 20
 const LOCK_DELAY_MS = 50
-
-function sleep(ms: number): Promise<void> {
-	return new Promise((resolve) => setTimeout(resolve, ms))
-}
 
 export class FileRouteRepository implements IRouteRepository {
 	private readonly filePath: string
@@ -118,15 +114,20 @@ export class FileRouteRepository implements IRouteRepository {
 			writeFileSync(this.filePath, '[]', 'utf-8')
 		}
 
-		const watcher = watch(this.filePath, { persistent: false }, () => {
-			try {
-				callback(this.loadRoutes())
-			} catch {
-				// ignore errors during watch callback
-			}
-		})
+		let debounceTimer: ReturnType<typeof setTimeout> | null = null
+		const debouncedCallback = () => {
+			if (debounceTimer) clearTimeout(debounceTimer)
+			debounceTimer = setTimeout(() => {
+				try {
+					callback(this.loadRoutes())
+				} catch {
+					// ignore errors during watch callback
+				}
+			}, 100)
+		}
 
-		// Polling fallback
+		const watcher = watch(this.filePath, { persistent: false }, debouncedCallback)
+
 		const interval = setInterval(() => {
 			try {
 				callback(this.loadRoutes())
@@ -139,6 +140,7 @@ export class FileRouteRepository implements IRouteRepository {
 			dispose() {
 				watcher.close()
 				clearInterval(interval)
+				if (debounceTimer) clearTimeout(debounceTimer)
 			},
 		}
 	}
@@ -173,10 +175,10 @@ export class FileRouteRepository implements IRouteRepository {
 				mkdirSync(this.lockDir)
 				return true
 			} catch {
-				// Lock exists, wait
-				const start = Date.now()
-				while (Date.now() - start < LOCK_DELAY_MS) {
-					// busy wait (using Atomics.wait would be better but requires SharedArrayBuffer)
+				// Lock exists — brief spin wait (we're in a sync context)
+				const deadline = Date.now() + LOCK_DELAY_MS
+				while (Date.now() < deadline) {
+					// busy wait — unavoidable in sync context
 				}
 			}
 		}

@@ -1,0 +1,209 @@
+---
+import Terminal from './Terminal.astro';
+
+const steps = [
+  {
+    number: '01',
+    title: 'Start the proxy',
+    description: 'The proxy listens on a single port and routes all *.localhost traffic.',
+    terminal: 'localias proxy start',
+    lines: [
+      { type: 'prompt', text: '$ localias proxy start' },
+      { type: 'success', text: 'proxy listening on :1355' },
+      { type: 'output', text: 'routing *.localhost traffic' },
+    ],
+  },
+  {
+    number: '02',
+    title: 'Run your app',
+    description: 'Wrap your dev command with localias. It spawns the process and registers a route.',
+    terminal: 'localias run',
+    lines: [
+      { type: 'prompt', text: '$ localias run -- npm run dev' },
+      { type: 'output', text: 'spawning: npm run dev' },
+      { type: 'success', text: 'process started on port 3291' },
+    ],
+  },
+  {
+    number: '03',
+    title: 'Auto-detect & register',
+    description: 'The framework is detected, a port is allocated, and a .localhost route is registered.',
+    terminal: 'auto-detect',
+    lines: [
+      { type: 'output', text: 'framework: vite' },
+      { type: 'output', text: 'name inferred: myapp' },
+      { type: 'success', text: 'route: myapp.localhost:1355 → :3291' },
+    ],
+  },
+  {
+    number: '04',
+    title: 'Access your app',
+    description: 'Open the stable URL in your browser. It never changes, even if the port does.',
+    terminal: 'browser',
+    lines: [
+      { type: 'success', text: 'http://myapp.localhost:1355' },
+      { type: 'output', text: '' },
+      { type: 'output', text: 'stable forever — no port to remember' },
+    ],
+  },
+];
+
+const typeClassMap: Record<string, string> = {
+  prompt: 'terminal-prompt',
+  output: 'terminal-output',
+  success: 'terminal-success',
+  warning: 'terminal-warning',
+};
+---
+
+<section class="section" id="how-it-works">
+  <div class="container">
+    <h2 class="section-title reveal">How It <span class="gradient-text">Works</span></h2>
+    <p class="section-subtitle reveal">Four steps from install to stable URLs.</p>
+
+    <div class="steps-grid">
+      {steps.map((step, i) => (
+        <div class="step-card reveal" style={`--delay: ${i * 0.1}s`}>
+          <div class="step-number">{step.number}</div>
+          <h3 class="step-title">{step.title}</h3>
+          <p class="step-description">{step.description}</p>
+          <Terminal title={step.terminal}>
+            {step.lines.map((line) => (
+              <div class="terminal-line">
+                <span class={typeClassMap[line.type]}>{line.text}</span>
+              </div>
+            ))}
+          </Terminal>
+        </div>
+      ))}
+    </div>
+
+    <div class="routing-table reveal" style="--delay: 0.5s">
+      <h3 class="routing-title">Routing Table</h3>
+      <Terminal title="localias list">
+        <div class="terminal-line"><span class="terminal-output">HOSTNAME                    PORT    STATUS</span></div>
+        <div class="terminal-line"><span class="terminal-success">myapp.localhost:1355</span><span class="terminal-output">        3291    running</span></div>
+        <div class="terminal-line"><span class="terminal-success">api.localhost:1355</span><span class="terminal-output">          4102    running</span></div>
+        <div class="terminal-line"><span class="terminal-success">docs.localhost:1355</span><span class="terminal-output">         5500    running</span></div>
+      </Terminal>
+    </div>
+
+    <div class="docker-section reveal" style="--delay: 0.6s">
+      <h3 class="section-title" style="font-size:1.5rem; margin-top:48px">Works with <span class="gradient-text">Docker</span> too</h3>
+      <p class="section-subtitle">Wrap your Docker Compose command — localias discovers services, allocates ports, and injects env vars automatically.</p>
+      <div class="docker-grid">
+        <div class="docker-card">
+          <Terminal title="docker-compose.yml">
+            <div class="terminal-line"><span class="terminal-output">services:</span></div>
+            <div class="terminal-line"><span class="terminal-output">  web:</span></div>
+            <div class="terminal-line"><span class="terminal-output">    build: ./web</span></div>
+            <div class="terminal-line"><span class="terminal-output">    environment:</span></div>
+            <div class="terminal-line"><span class="terminal-warning">      - PORT=$&lbrace;WEB_PORT&rbrace;</span></div>
+            <div class="terminal-line"><span class="terminal-output">  api:</span></div>
+            <div class="terminal-line"><span class="terminal-output">    build: ./api</span></div>
+            <div class="terminal-line"><span class="terminal-output">    environment:</span></div>
+            <div class="terminal-line"><span class="terminal-warning">      - PORT=$&lbrace;API_PORT&rbrace;</span></div>
+          </Terminal>
+        </div>
+        <div class="docker-card">
+          <Terminal title="localias compose">
+            <div class="terminal-line"><span class="terminal-prompt">$ </span><span class="terminal-command">localias compose -- docker compose up</span></div>
+            <div class="terminal-line"><span class="terminal-output">parsing docker-compose.yml...</span></div>
+            <div class="terminal-line"><span class="terminal-output">discovered 2 services</span></div>
+            <div class="terminal-line"><span class="terminal-output">injecting WEB_PORT=3291, API_PORT=4102</span></div>
+            <div class="terminal-line">&nbsp;</div>
+            <div class="terminal-line"><span class="terminal-success">web.myapp.localhost:1355  → :3291</span></div>
+            <div class="terminal-line"><span class="terminal-success">api.myapp.localhost:1355  → :4102</span></div>
+            <div class="terminal-line">&nbsp;</div>
+            <div class="terminal-line"><span class="terminal-output">routes cleanup on exit (Ctrl+C)</span></div>
+          </Terminal>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .step-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 28px;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .step-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px var(--card-shadow);
+  }
+
+  .step-number {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 800;
+    background: var(--gradient-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+
+  .step-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .step-description {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .routing-table {
+    margin-top: 16px;
+  }
+
+  .routing-title {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .docker-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .docker-card {
+    transition: transform 0.3s;
+  }
+
+  .docker-card:hover {
+    transform: translateY(-4px);
+  }
+
+  @media (max-width: 768px) {
+    .steps-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .docker-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

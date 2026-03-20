@@ -1,11 +1,11 @@
-import type { ILogger } from '@publify/core'
+import type { ILogger } from '@localias/core'
 
 type LogLevel = 'silent' | 'info' | 'debug'
 
 function getLevel(): LogLevel {
-	const env = process.env['PUBLIFY_DEBUG']
+	const env = process.env.LOCALIAS_DEBUG
 	if (env === '1' || env === 'true') return 'debug'
-	if (process.env['PUBLIFY_SILENT'] === '1') return 'silent'
+	if (process.env.LOCALIAS_SILENT === '1') return 'silent'
 	return 'info'
 }
 

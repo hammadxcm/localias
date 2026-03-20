@@ -1,10 +1,11 @@
 {
-  "name": "publify",
-  "version": "0.0.0",
+  "name": "localias",
+  "version": "0.0.1",
   "type": "module",
   "bin": {
-    "publify": "./dist/cli.js"
+    "localias": "./dist/cli.js"
   },
+  "files": ["dist"],
   "main": "./dist/cli.js",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -13,12 +14,13 @@
     "lint": "biome check src/"
   },
   "dependencies": {
-    "@publify/core": "workspace:*",
-    "@publify/infra": "workspace:*",
-    "@publify/plugin-sdk": "workspace:*",
+    "@localias/core": "workspace:*",
+    "@localias/infra": "workspace:*",
+    "@localias/plugin-sdk": "workspace:*",
     "chalk": "^5.4.1"
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
     "vitest": "^3.1.1"
   }
 }

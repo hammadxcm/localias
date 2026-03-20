@@ -1,8 +1,8 @@
 {
-  "name": "publify",
+  "name": "localias",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.7.0",
+  "packageManager": "pnpm@10.30.1",
   "scripts": {
     "build": "turbo run build",
     "test": "turbo run test",
@@ -10,8 +10,9 @@
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "turbo": "2.4.4",
     "@biomejs/biome": "1.9.4",
+    "@types/node": "^25.5.0",
+    "turbo": "2.4.4",
     "typescript": "5.8.3"
   }
 }

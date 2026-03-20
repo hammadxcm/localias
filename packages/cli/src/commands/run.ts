@@ -1,5 +1,5 @@
-import type { Container } from '@publify/infra'
-import { isErr } from '@publify/core'
+import { isErr } from '@localias/core'
+import type { Container } from '@localias/infra'
 import type { ArgParser } from '../parser.js'
 
 export async function runCommand(parser: ArgParser, container: Container): Promise<void> {
@@ -10,12 +10,19 @@ export async function runCommand(parser: ArgParser, container: Container): Promi
 	const command = parser.rest()
 
 	if (command.length === 0) {
-		console.error('Error: No command specified. Usage: publify run -- <command>')
+		console.error('Error: No command specified. Usage: localias run -- <command>')
 		process.exitCode = 1
 		return
 	}
 
-	const result = await container.runApp.execute({ command, name, force, appPort, tld })
+	const result = await container.runApp.execute({
+		command,
+		name,
+		force,
+		appPort,
+		tld,
+		cwd: process.cwd(),
+	})
 	if (isErr(result)) {
 		console.error(`Error: ${result.error.message}`)
 		process.exitCode = 1

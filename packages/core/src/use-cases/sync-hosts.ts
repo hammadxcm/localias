@@ -1,8 +1,8 @@
-import type { Result } from '../result.js'
-import { ok, isErr } from '../result.js'
-import type { IRouteRepository } from '../ports/route-repository.js'
 import type { IHostsManager } from '../ports/hosts-manager.js'
 import type { ILogger } from '../ports/logger.js'
+import type { IRouteRepository } from '../ports/route-repository.js'
+import type { Result } from '../result.js'
+import { isErr, ok } from '../result.js'
 
 export interface SyncHostsDeps {
 	readonly routes: IRouteRepository

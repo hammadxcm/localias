@@ -1,39 +1,44 @@
 import type {
-	IRouteRepository,
-	IProxyServer,
 	ICertificateManager,
+	IComposeAdapter,
+	IGitAdapter,
 	IHostsManager,
+	ILogger,
 	IPortAllocator,
 	IProcessManager,
-	ILogger,
-	IGitAdapter,
 	IProjectDetector,
+	IProxyServer,
+	IRouteRepository,
 	IStateManager,
-} from '@publify/core'
+} from '@localias/core'
 import {
+	AddAliasUseCase,
+	CleanHostsUseCase,
+	GetServiceUrlUseCase,
+	ListRoutesUseCase,
 	PluginRegistry,
+	RemoveAliasUseCase,
 	RunAppUseCase,
+	RunComposeUseCase,
 	StartProxyUseCase,
 	StopProxyUseCase,
-	AddAliasUseCase,
-	RemoveAliasUseCase,
-	ListRoutesUseCase,
-	GetServiceUrlUseCase,
-	TrustCaUseCase,
 	SyncHostsUseCase,
-	CleanHostsUseCase,
-} from '@publify/core'
+	TrustCaUseCase,
+} from '@localias/core'
 
-import { ConsoleLogger } from './logger/console-logger.js'
-import { FileStateManager } from './state/file-state-manager.js'
-import { TcpPortAllocator } from './ports/tcp-port-allocator.js'
-import { CliGitAdapter } from './git/cli-git-adapter.js'
-import { FilesystemProjectDetector } from './project/filesystem-project-detector.js'
-import { FileRouteRepository } from './routes/file-route-repository.js'
-import { FileHostsManager } from './hosts/file-hosts-manager.js'
-import { NodeProcessManager } from './process/node-process-manager.js'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { X509CertificateManager } from './certs/x509-certificate-manager.js'
+import { ShellComposeAdapter } from './compose/shell-compose-adapter.js'
+import { CliGitAdapter } from './git/cli-git-adapter.js'
+import { FileHostsManager } from './hosts/file-hosts-manager.js'
+import { ConsoleLogger } from './logger/console-logger.js'
+import { TcpPortAllocator } from './ports/tcp-port-allocator.js'
+import { NodeProcessManager } from './process/node-process-manager.js'
+import { FilesystemProjectDetector } from './project/filesystem-project-detector.js'
 import { NodeProxyServer } from './proxy/node-proxy-server.js'
+import { FileRouteRepository } from './routes/file-route-repository.js'
+import { FileStateManager } from './state/file-state-manager.js'
 
 export interface Container {
 	// Infrastructure
@@ -48,6 +53,7 @@ export interface Container {
 	readonly certs: ICertificateManager
 	readonly proxy: IProxyServer
 	readonly plugins: PluginRegistry
+	readonly compose: IComposeAdapter
 
 	// Use cases
 	readonly runApp: RunAppUseCase
@@ -60,6 +66,7 @@ export interface Container {
 	readonly trustCa: TrustCaUseCase
 	readonly syncHosts: SyncHostsUseCase
 	readonly cleanHosts: CleanHostsUseCase
+	readonly runCompose: RunComposeUseCase
 }
 
 export interface ContainerOverrides {
@@ -74,6 +81,7 @@ export interface ContainerOverrides {
 	readonly certs?: ICertificateManager
 	readonly proxy?: IProxyServer
 	readonly plugins?: PluginRegistry
+	readonly compose?: IComposeAdapter
 }
 
 export function createContainer(overrides?: ContainerOverrides): Container {
@@ -87,14 +95,32 @@ export function createContainer(overrides?: ContainerOverrides): Container {
 	const proxy = overrides?.proxy ?? new NodeProxyServer(certs)
 	const hosts = overrides?.hosts ?? new FileHostsManager()
 	const plugins = overrides?.plugins ?? new PluginRegistry()
+	const compose = overrides?.compose ?? new ShellComposeAdapter()
 
-	// Routes need a state dir — use default discovery
-	const stateDir = state.resolveStateDir(1355)
+	// Routes need a state dir — use the base state dir, not tied to any specific port
+	const stateDir = process.env.LOCALIAS_STATE_DIR ?? join(tmpdir(), 'localias')
 	const routes = overrides?.routes ?? new FileRouteRepository(stateDir, processManager)
 
 	// Wire use cases
-	const runApp = new RunAppUseCase({ routes, ports, process: processManager, state, git, project, logger, plugins })
-	const startProxy = new StartProxyUseCase({ proxy, routes, certs, state, hosts, process: processManager, logger })
+	const runApp = new RunAppUseCase({
+		routes,
+		ports,
+		process: processManager,
+		state,
+		git,
+		project,
+		logger,
+		plugins,
+	})
+	const startProxy = new StartProxyUseCase({
+		proxy,
+		routes,
+		certs,
+		state,
+		hosts,
+		process: processManager,
+		logger,
+	})
 	const stopProxy = new StopProxyUseCase({ state, process: processManager, logger })
 	const addAlias = new AddAliasUseCase({ routes, logger })
 	const removeAlias = new RemoveAliasUseCase({ routes, logger })
@@ -103,6 +129,15 @@ export function createContainer(overrides?: ContainerOverrides): Container {
 	const trustCa = new TrustCaUseCase({ certs, state, logger })
 	const syncHosts = new SyncHostsUseCase({ routes, hosts, logger })
 	const cleanHosts = new CleanHostsUseCase({ hosts, logger })
+	const runCompose = new RunComposeUseCase({
+		routes,
+		ports,
+		process: processManager,
+		state,
+		project,
+		compose,
+		logger,
+	})
 
 	return Object.freeze({
 		logger,
@@ -116,6 +151,7 @@ export function createContainer(overrides?: ContainerOverrides): Container {
 		certs,
 		proxy,
 		plugins,
+		compose,
 		runApp,
 		startProxy,
 		stopProxy,
@@ -126,6 +162,7 @@ export function createContainer(overrides?: ContainerOverrides): Container {
 		trustCa,
 		syncHosts,
 		cleanHosts,
+		runCompose,
 	})
 }
 

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { PluginRegistry } from './registry.js'
 import type { FrameworkPlugin } from './types.js'
 
@@ -46,5 +46,23 @@ describe('PluginRegistry', () => {
 		const registry = new PluginRegistry()
 		const result = registry.injectFlags(['unknown', 'cmd'], 4000)
 		expect(result).toEqual(['unknown', 'cmd'])
+	})
+
+	it('handles empty command array', () => {
+		const registry = new PluginRegistry()
+		registry.register(testPlugin)
+		expect(registry.detect([])).toBeNull()
+	})
+
+	it('injectFlags with empty array returns empty', () => {
+		const registry = new PluginRegistry()
+		const result = registry.injectFlags([], 4000)
+		expect(result).toEqual([])
+	})
+
+	it('handles yarn dlx', () => {
+		const registry = new PluginRegistry()
+		registry.register(testPlugin)
+		expect(registry.detect(['yarn', 'dlx', 'test-fw'])?.name).toBe('test-framework')
 	})
 })

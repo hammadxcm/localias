@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+import { isErr, isOk } from '../result.js'
 import { Port } from './port.js'
-import { isOk, isErr } from '../result.js'
 
 describe('Port', () => {
 	it('creates valid port', () => {
@@ -28,5 +28,23 @@ describe('Port', () => {
 	it('isPrivileged', () => {
 		expect(Port.isPrivileged({ value: 80 } as any)).toBe(true)
 		expect(Port.isPrivileged({ value: 1024 } as any)).toBe(false)
+	})
+
+	it('accepts boundary value 1', () => {
+		const r = Port.create(1)
+		expect(isOk(r)).toBe(true)
+	})
+
+	it('accepts boundary value 65535', () => {
+		const r = Port.create(65535)
+		expect(isOk(r)).toBe(true)
+	})
+
+	it('rejects NaN', () => {
+		expect(isErr(Port.create(Number.NaN))).toBe(true)
+	})
+
+	it('rejects Infinity', () => {
+		expect(isErr(Port.create(Number.POSITIVE_INFINITY))).toBe(true)
 	})
 })

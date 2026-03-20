@@ -1,5 +1,5 @@
-import type { Container } from '@publify/infra'
-import { isErr } from '@publify/core'
+import { isErr } from '@localias/core'
+import type { Container } from '@localias/infra'
 import type { ArgParser } from '../parser.js'
 
 export async function proxyStartCommand(parser: ArgParser, container: Container): Promise<void> {
@@ -26,7 +26,13 @@ export async function proxyStartCommand(parser: ArgParser, container: Container)
 	}
 
 	if (foreground) {
-		// Keep process alive
-		await new Promise(() => {})
+		await new Promise<void>((resolve) => {
+			const shutdown = async () => {
+				await container.stopProxy.execute()
+				resolve()
+			}
+			process.on('SIGINT', shutdown)
+			process.on('SIGTERM', shutdown)
+		})
 	}
 }

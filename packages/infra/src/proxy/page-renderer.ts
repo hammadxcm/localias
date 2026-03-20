@@ -1,4 +1,4 @@
-import type { Route } from '@publify/core'
+import type { Route } from '@localias/core'
 
 const FONT_STACK = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 
@@ -8,7 +8,7 @@ function baseHtml(title: string, body: string): string {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${title} — Publify</title>
+<title>${title} — Localias</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -73,46 +73,62 @@ ${body}
 
 export class PageRenderer {
 	render404(host: string, routes: Route[], proxyPort: number, tls: boolean): string {
-		const routeHtml = routes.length > 0
-			? `<div class="routes">
-${routes.map((r) => {
-	const url = r.hostname.toUrl(proxyPort, tls)
-	return `<div class="route"><a href="${url}" class="route-host">${r.hostname.value}</a><span class="route-port">:${r.port.value}</span></div>`
-}).join('\n')}
+		const routeHtml =
+			routes.length > 0
+				? `<div class="routes">
+${routes
+	.map((r) => {
+		const url = r.hostname.toUrl(proxyPort, tls)
+		return `<div class="route"><a href="${url}" class="route-host">${r.hostname.value}</a><span class="route-port">:${r.port.value}</span></div>`
+	})
+	.join('\n')}
 </div>`
-			: '<p>No routes registered yet.</p>'
+				: '<p>No routes registered yet.</p>'
 
-		return baseHtml('Not Found', `
+		return baseHtml(
+			'Not Found',
+			`
 <div class="code">404</div>
 <h1>No route for ${escapeHtml(host)}</h1>
-<p>This hostname isn't registered with Publify.</p>
+<p>This hostname isn't registered with Localias.</p>
 ${routeHtml}
-`)
+`,
+		)
 	}
 
 	render502(host: string, port: number): string {
-		return baseHtml('Bad Gateway', `
+		return baseHtml(
+			'Bad Gateway',
+			`
 <div class="code">502</div>
 <h1>Cannot reach ${escapeHtml(host)}</h1>
 <p>The app at <strong>127.0.0.1:${port}</strong> isn't responding.</p>
 <div class="hint">
 <p>Make sure your app is running and listening on port <code>${port}</code>.</p>
 </div>
-`)
+`,
+		)
 	}
 
 	render508(host: string): string {
-		return baseHtml('Loop Detected', `
+		return baseHtml(
+			'Loop Detected',
+			`
 <div class="code">508</div>
 <h1>Loop detected for ${escapeHtml(host)}</h1>
-<p>The request was forwarded too many times. This usually means the app is proxying back to Publify.</p>
+<p>The request was forwarded too many times. This usually means the app is proxying back to Localias.</p>
 <div class="hint">
 <p>Ensure your app connects to its upstream directly, not through the <code>.localhost</code> URL.</p>
 </div>
-`)
+`,
+		)
 	}
 }
 
 function escapeHtml(s: string): string {
-	return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+	return s
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
 }

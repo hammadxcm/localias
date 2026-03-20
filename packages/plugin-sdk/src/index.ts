@@ -9,5 +9,5 @@ export { reactNativePlugin } from './built-in/react-native.js'
 export { expoPlugin } from './built-in/expo.js'
 
 // Re-export core plugin types for convenience
-export type { FrameworkPlugin, FrameworkDetectionContext } from '@publify/core'
-export { PluginRegistry } from '@publify/core'
+export type { FrameworkPlugin, FrameworkDetectionContext } from '@localias/core'
+export { PluginRegistry } from '@localias/core'

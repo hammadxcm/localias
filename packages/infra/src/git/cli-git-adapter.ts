@@ -1,13 +1,17 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
-import type { IGitAdapter, WorktreeResult } from '@publify/core'
+import type { IGitAdapter, WorktreeResult } from '@localias/core'
 
 const SKIP_BRANCHES = new Set(['main', 'master', 'develop', 'dev'])
 
 function execGit(args: string[], cwd: string): string | null {
 	try {
-		return execFileSync('git', args, { cwd, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }).trim()
+		return execFileSync('git', args, {
+			cwd,
+			encoding: 'utf-8',
+			stdio: ['pipe', 'pipe', 'pipe'],
+		}).trim()
 	} catch {
 		return null
 	}

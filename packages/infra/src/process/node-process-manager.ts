@@ -1,9 +1,9 @@
 import { spawn as cpSpawn, execFileSync } from 'node:child_process'
-import { join, delimiter } from 'node:path'
-import type { IProcessManager, ProcessId } from '@publify/core'
-import type { Result } from '@publify/core'
-import { ok, err } from '@publify/core'
-import { ProcessId as PidVO } from '@publify/core'
+import { delimiter, join } from 'node:path'
+import type { IProcessManager, ProcessId } from '@localias/core'
+import type { Result } from '@localias/core'
+import { err, ok } from '@localias/core'
+import { ProcessId as PidVO } from '@localias/core'
 
 export class NodeProcessManager implements IProcessManager {
 	isAlive(pid: ProcessId): boolean {
@@ -20,12 +20,11 @@ export class NodeProcessManager implements IProcessManager {
 		const isWindows = process.platform === 'win32'
 		const shell = isWindows ? 'cmd.exe' : '/bin/sh'
 		const shellFlag = isWindows ? '/c' : '-c'
-		const cmdStr = command.join(' ')
+		const cmdStr = command.map((arg) => (arg.includes(' ') ? `"${arg}"` : arg)).join(' ')
 
-		// Augment PATH with node_modules/.bin
 		const augmentedPath = [
 			join(process.cwd(), 'node_modules', '.bin'),
-			process.env['PATH'] ?? '',
+			process.env.PATH ?? '',
 		].join(delimiter)
 
 		const child = cpSpawn(shell, [shellFlag, cmdStr], {
@@ -38,7 +37,13 @@ export class NodeProcessManager implements IProcessManager {
 			cwd: process.cwd(),
 		})
 
+		let exited = false
+
 		const cleanup = () => {
+			if (exited) return
+			exited = true
+			process.removeListener('SIGINT', onSigInt)
+			process.removeListener('SIGTERM', onSigTerm)
 			if (onCleanup) onCleanup()
 		}
 
@@ -47,13 +52,15 @@ export class NodeProcessManager implements IProcessManager {
 			process.exitCode = code ?? 1
 		})
 
-		// Forward signals to child
-		const forwardSignal = (signal: NodeJS.Signals) => {
-			child.kill(signal)
+		const onSigInt = () => {
+			child.kill('SIGINT')
+		}
+		const onSigTerm = () => {
+			child.kill('SIGTERM')
 		}
 
-		process.on('SIGINT', () => forwardSignal('SIGINT'))
-		process.on('SIGTERM', () => forwardSignal('SIGTERM'))
+		process.on('SIGINT', onSigInt)
+		process.on('SIGTERM', onSigTerm)
 	}
 
 	kill(pid: ProcessId, signal?: string): Result<void, Error> {
@@ -70,14 +77,14 @@ export class NodeProcessManager implements IProcessManager {
 		try {
 			if (process.platform === 'win32') {
 				const output = execFileSync('netstat', ['-ano'], { encoding: 'utf-8' })
-				const match = output.match(new RegExp(`:${port}\\s+\\S+\\s+LISTENING\\s+(\\d+)`))
-				if (match?.[1]) return PidVO.create(parseInt(match[1], 10))
+				const match = output.match(new RegExp(`[:\\.]${port}\\s+\\S+\\s+LISTENING\\s+(\\d+)`))
+				if (match?.[1]) return PidVO.create(Number.parseInt(match[1], 10))
 			} else {
 				const output = execFileSync('lsof', ['-i', `:${port}`, '-t', '-sTCP:LISTEN'], {
 					encoding: 'utf-8',
 					stdio: ['pipe', 'pipe', 'pipe'],
 				})
-				const pid = parseInt(output.trim().split('\n')[0]!, 10)
+				const pid = Number.parseInt(output.trim().split('\n')[0]!, 10)
 				if (!Number.isNaN(pid)) return PidVO.create(pid)
 			}
 		} catch {

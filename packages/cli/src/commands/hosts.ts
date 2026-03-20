@@ -1,5 +1,5 @@
-import type { Container } from '@publify/infra'
-import { isErr } from '@publify/core'
+import { isErr } from '@localias/core'
+import type { Container } from '@localias/infra'
 
 export function hostsCommand(subcommand: string | undefined, container: Container): void {
 	switch (subcommand) {
@@ -20,7 +20,7 @@ export function hostsCommand(subcommand: string | undefined, container: Containe
 			break
 		}
 		default:
-			console.error('Usage: publify hosts <sync|clean>')
+			console.error('Usage: localias hosts <sync|clean>')
 			process.exitCode = 1
 	}
 }

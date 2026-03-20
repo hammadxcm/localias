@@ -1,7 +1,7 @@
 import type { ProxyMiddleware } from './types.js'
 
 export const routeMatcher: ProxyMiddleware = (ctx, next) => {
-	const host = ctx.metadata['host'] as string | undefined
+	const host = ctx.metadata.host as string | undefined
 	if (!host) return next()
 
 	const routes = ctx.routes()

@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { readFileSync, existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 
 export class PlatformTrustManager {
 	async trustCA(caPath: string): Promise<void> {
@@ -16,11 +16,15 @@ export class PlatformTrustManager {
 	}
 
 	private trustMacOS(caPath: string): void {
+		const home = process.env.HOME
+		if (!home) throw new Error('HOME environment variable not set')
 		execFileSync('security', [
 			'add-trusted-cert',
 			'-d',
-			'-r', 'trustRoot',
-			'-k', `${process.env['HOME']}/Library/Keychains/login.keychain-db`,
+			'-r',
+			'trustRoot',
+			'-k',
+			`${home}/Library/Keychains/login.keychain-db`,
 			caPath,
 		])
 	}
@@ -30,11 +34,16 @@ export class PlatformTrustManager {
 		let distro = 'unknown'
 		try {
 			const osRelease = readFileSync('/etc/os-release', 'utf-8')
-			if (osRelease.includes('ubuntu') || osRelease.includes('debian')) {
+			const osReleaseLower = osRelease.toLowerCase()
+			if (osReleaseLower.includes('ubuntu') || osReleaseLower.includes('debian')) {
 				distro = 'debian'
-			} else if (osRelease.includes('fedora') || osRelease.includes('rhel') || osRelease.includes('centos')) {
+			} else if (
+				osReleaseLower.includes('fedora') ||
+				osReleaseLower.includes('rhel') ||
+				osReleaseLower.includes('centos')
+			) {
 				distro = 'redhat'
-			} else if (osRelease.includes('arch')) {
+			} else if (osReleaseLower.includes('arch')) {
 				distro = 'arch'
 			}
 		} catch {
@@ -43,22 +52,34 @@ export class PlatformTrustManager {
 
 		switch (distro) {
 			case 'debian': {
-				execFileSync('sudo', ['cp', caPath, '/usr/local/share/ca-certificates/publify-ca.crt'])
+				execFileSync('sudo', ['cp', caPath, '/usr/local/share/ca-certificates/localias-ca.crt'])
 				execFileSync('sudo', ['update-ca-certificates'])
 				break
 			}
 			case 'redhat':
 			case 'arch': {
-				execFileSync('sudo', ['cp', caPath, '/etc/pki/ca-trust/source/anchors/publify-ca.crt'])
+				execFileSync('sudo', ['cp', caPath, '/etc/pki/ca-trust/source/anchors/localias-ca.crt'])
 				execFileSync('sudo', ['update-ca-trust'])
 				break
 			}
 			default: {
 				// Try certutil for NSS databases (Firefox, Chrome)
 				if (existsSync('/usr/bin/certutil')) {
-					execFileSync('certutil', ['-d', 'sql:$HOME/.pki/nssdb', '-A', '-t', 'C,,', '-n', 'Publify Local CA', '-i', caPath])
+					execFileSync('certutil', [
+						'-d',
+						`sql:${process.env.HOME}/.pki/nssdb`,
+						'-A',
+						'-t',
+						'C,,',
+						'-n',
+						'Localias Local CA',
+						'-i',
+						caPath,
+					])
 				} else {
-					throw new Error(`Cannot determine how to trust CA on this Linux distribution. Manually install ${caPath}.`)
+					throw new Error(
+						`Cannot determine how to trust CA on this Linux distribution. Manually install ${caPath}.`,
+					)
 				}
 			}
 		}

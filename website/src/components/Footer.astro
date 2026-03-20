@@ -1,0 +1,209 @@
+---
+import Logo from './Logo.astro';
+---
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-left">
+      <div class="footer-brand">
+        <Logo />
+        <span class="footer-name">localias</span>
+      </div>
+      <p class="footer-tagline">Stable .localhost URLs for every dev service.</p>
+      <p class="footer-credit">Made by Hammad Khan</p>
+    </div>
+    <div class="footer-center">
+      <h4 class="footer-heading">Links</h4>
+      <a href="https://github.com/hammadxcm/localias" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub<span class="sr-only">(opens in new tab)</span></a>
+      <a href="https://www.npmjs.com/package/localias" target="_blank" rel="noopener noreferrer" class="footer-link">npm<span class="sr-only">(opens in new tab)</span></a>
+      <a href="https://github.com/hammadxcm/localias/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="footer-link">MIT License<span class="sr-only">(opens in new tab)</span></a>
+      <a href="https://hk.fyniti.co.uk" target="_blank" rel="noopener noreferrer" class="footer-link">Portfolio<span class="sr-only">(opens in new tab)</span></a>
+    </div>
+    <div class="footer-right">
+      <a
+        href="https://github.com/hammadxcm/localias"
+        class="footer-star-btn"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .587l3.668 7.568L24 9.306l-6 5.858 1.416 8.249L12 19.446l-7.416 3.967L6 15.164 0 9.306l8.332-1.151z"/></svg>
+        Star on GitHub<span class="sr-only">(opens in new tab)</span>
+      </a>
+      <a
+        href="https://github.com/hammadxcm"
+        class="footer-link"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        @hammadxcm<span class="sr-only">(opens in new tab)</span>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: relative;
+    border-top: 1px solid transparent;
+    border-image: linear-gradient(90deg, transparent, var(--red), transparent) 1;
+    padding: 48px 0;
+  }
+
+  .footer::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--red),
+      var(--yellow),
+      var(--cyan),
+      var(--red),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: gradient-border-flow 4s linear infinite;
+  }
+
+  .footer-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .footer-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .footer-tagline {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .footer-credit {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-top: 4px;
+  }
+
+  .footer-center {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-heading {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .footer-link {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    transition: color 0.2s;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .footer-link::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+  }
+
+  .footer-link:hover {
+    color: var(--text);
+    opacity: 1;
+  }
+
+  .footer-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .footer-right {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .footer-star-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--red);
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: background 0.2s, box-shadow 0.2s;
+    min-height: 44px;
+  }
+
+  .footer-star-btn:hover {
+    background: #ff5252;
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+    opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    .footer-inner {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 32px;
+    }
+
+    .footer-left,
+    .footer-center,
+    .footer-right {
+      align-items: center;
+    }
+
+    .footer-brand {
+      justify-content: center;
+    }
+
+    .footer-link {
+      width: fit-content;
+    }
+
+    .footer-star-btn {
+      width: 100%;
+      max-width: 220px;
+      justify-content: center;
+    }
+  }
+</style>
