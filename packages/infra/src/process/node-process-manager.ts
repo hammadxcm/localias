@@ -111,9 +111,7 @@ export class NodeProcessManager implements IProcessManager {
 		process.on('SIGTERM', onSigTerm)
 
 		for (const entry of entries) {
-			const cmdStr = entry.command
-				.map((arg) => (arg.includes(' ') ? `"${arg}"` : arg))
-				.join(' ')
+			const cmdStr = entry.command.map((arg) => (arg.includes(' ') ? `"${arg}"` : arg)).join(' ')
 
 			const child = cpSpawn(shell, [shellFlag, cmdStr], {
 				stdio: 'inherit',

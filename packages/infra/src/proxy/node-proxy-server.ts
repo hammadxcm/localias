@@ -260,8 +260,9 @@ export class NodeProxyServer implements IProxyServer {
 			return
 		}
 
+		const target = matched
 		const connectUpstream = (hostname: string) => {
-			const serverSocket = net.connect(matched!.port.value, hostname, () => {
+			const serverSocket = net.connect(target.port.value, hostname, () => {
 				const rawReq = `${req.method} ${req.url} HTTP/${req.httpVersion}\r\n${Object.entries(
 					req.headers,
 				)

@@ -41,6 +41,7 @@ function createMockDeps(
 	const process: IProcessManager = {
 		isAlive: vi.fn(() => true),
 		spawn: vi.fn(),
+		spawnMultiple: vi.fn(),
 		kill: vi.fn(() => ok(undefined)),
 		findPidOnPort: vi.fn(() => null),
 		currentPid: vi.fn(() => ProcessId.create(1234)),
