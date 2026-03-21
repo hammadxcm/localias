@@ -9,6 +9,7 @@ localias — stable .localhost URLs for local development
 Usage:
   localias <name> -- <command>     Run app with a named .localhost URL
   localias run -- <command>        Run app (name inferred from project)
+  localias up                      Start all services from .localiasrc
   localias compose -- <cmd>        Route Docker Compose services via proxy
   localias proxy start             Start the proxy server
   localias proxy stop              Stop the proxy server

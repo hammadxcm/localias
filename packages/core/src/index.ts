@@ -75,6 +75,7 @@ export {
 	SyncHostsUseCase,
 	CleanHostsUseCase,
 	RunComposeUseCase,
+	RunUpUseCase,
 } from './use-cases/index.js'
 
 export type {
@@ -95,4 +96,8 @@ export type {
 	RunComposeDeps,
 	RunComposeParams,
 	ComposeRouteInfo,
+	RunUpDeps,
+	RunUpParams,
+	RunUpServiceConfig,
+	RunUpServiceInfo,
 } from './use-cases/index.js'

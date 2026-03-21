@@ -181,42 +181,49 @@ export class NodeProxyServer implements IProxyServer {
 					return
 				}
 
-				// Proxy the request
+				// Proxy the request — try IPv4 first, fall back to IPv6
 				const fwdHeaders = (ctx.metadata.forwardedHeaders ?? {}) as Record<string, string>
-				const proxyReq = http.request(
-					{
-						hostname: '127.0.0.1',
-						port: route.port.value,
-						path: req.url,
-						method: req.method,
-						headers: { ...req.headers, ...fwdHeaders },
-					},
-					(proxyRes) => {
-						// Strip hop-by-hop headers for HTTP/2
-						const headers = { ...proxyRes.headers }
-						if ((req as any).httpVersion === '2.0') {
-							for (const key of Object.keys(headers)) {
-								if (HOP_BY_HOP.has(key.toLowerCase())) {
-									delete headers[key]
+				const tryProxy = (hostname: string) => {
+					const proxyReq = http.request(
+						{
+							hostname,
+							port: route.port.value,
+							path: req.url,
+							method: req.method,
+							headers: { ...req.headers, ...fwdHeaders },
+						},
+						(proxyRes) => {
+							const headers = { ...proxyRes.headers }
+							if ((req as any).httpVersion === '2.0') {
+								for (const key of Object.keys(headers)) {
+									if (HOP_BY_HOP.has(key.toLowerCase())) {
+										delete headers[key]
+									}
 								}
 							}
+
+							res.writeHead(proxyRes.statusCode ?? 502, headers)
+							proxyRes.pipe(res)
+						},
+					)
+
+					proxyReq.on('error', () => {
+						if (hostname === '127.0.0.1') {
+							// IPv4 failed — retry on IPv6
+							tryProxy('::1')
+							return
 						}
+						if (!res.headersSent) {
+							const host = (ctx.metadata.host as string) ?? ''
+							res.statusCode = 502
+							res.setHeader('Content-Type', 'text/html; charset=utf-8')
+							res.end(this.pageRenderer.render502(host, route.port.value))
+						}
+					})
 
-						res.writeHead(proxyRes.statusCode ?? 502, headers)
-						proxyRes.pipe(res)
-					},
-				)
-
-				proxyReq.on('error', () => {
-					if (!res.headersSent) {
-						const host = (ctx.metadata.host as string) ?? ''
-						res.statusCode = 502
-						res.setHeader('Content-Type', 'text/html; charset=utf-8')
-						res.end(this.pageRenderer.render502(host, route.port.value))
-					}
-				})
-
-				req.pipe(proxyReq)
+					req.pipe(proxyReq)
+				}
+				tryProxy('127.0.0.1')
 			})
 			.catch((e) => {
 				for (const handler of this.errorHandlers) handler(e as Error)
@@ -253,21 +260,30 @@ export class NodeProxyServer implements IProxyServer {
 			return
 		}
 
-		const serverSocket = net.connect(matched.port.value, '127.0.0.1', () => {
-			const rawReq = `${req.method} ${req.url} HTTP/${req.httpVersion}\r\n${Object.entries(
-				req.headers,
-			)
-				.filter(([, v]) => v != null)
-				.map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
-				.join('\r\n')}\r\n\r\n`
+		const connectUpstream = (hostname: string) => {
+			const serverSocket = net.connect(matched!.port.value, hostname, () => {
+				const rawReq = `${req.method} ${req.url} HTTP/${req.httpVersion}\r\n${Object.entries(
+					req.headers,
+				)
+					.filter(([, v]) => v != null)
+					.map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+					.join('\r\n')}\r\n\r\n`
 
-			serverSocket.write(rawReq)
-			serverSocket.write(head)
-			clientSocket.pipe(serverSocket)
-			serverSocket.pipe(clientSocket)
-		})
+				serverSocket.write(rawReq)
+				serverSocket.write(head)
+				clientSocket.pipe(serverSocket)
+				serverSocket.pipe(clientSocket)
+			})
 
-		serverSocket.on('error', () => clientSocket.destroy())
-		clientSocket.on('error', () => serverSocket.destroy())
+			serverSocket.on('error', () => {
+				if (hostname === '127.0.0.1') {
+					connectUpstream('::1')
+					return
+				}
+				clientSocket.destroy()
+			})
+			clientSocket.on('error', () => serverSocket.destroy())
+		}
+		connectUpstream('127.0.0.1')
 	}
 }

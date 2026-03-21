@@ -12,6 +12,7 @@ import { proxyStartCommand } from './commands/proxy-start.js'
 import { proxyStopCommand } from './commands/proxy-stop.js'
 import { runCommand } from './commands/run.js'
 import { trustCommand } from './commands/trust.js'
+import { upCommand } from './commands/up.js'
 import { printHelp, printVersion } from './help.js'
 import { ArgParser } from './parser.js'
 
@@ -82,6 +83,11 @@ async function main(): Promise<void> {
 				console.error('Usage: localias proxy <start|stop>')
 				process.exitCode = 1
 			}
+			break
+		}
+		case 'up': {
+			const container = createDefaultContainer()
+			await upCommand(parser, container)
 			break
 		}
 		case 'compose': {

@@ -20,6 +20,7 @@ import {
 	RemoveAliasUseCase,
 	RunAppUseCase,
 	RunComposeUseCase,
+	RunUpUseCase,
 	StartProxyUseCase,
 	StopProxyUseCase,
 	SyncHostsUseCase,
@@ -67,6 +68,7 @@ export interface Container {
 	readonly syncHosts: SyncHostsUseCase
 	readonly cleanHosts: CleanHostsUseCase
 	readonly runCompose: RunComposeUseCase
+	readonly runUp: RunUpUseCase
 }
 
 export interface ContainerOverrides {
@@ -138,6 +140,13 @@ export function createContainer(overrides?: ContainerOverrides): Container {
 		compose,
 		logger,
 	})
+	const runUp = new RunUpUseCase({
+		routes,
+		ports,
+		process: processManager,
+		state,
+		logger,
+	})
 
 	return Object.freeze({
 		logger,
@@ -163,6 +172,7 @@ export function createContainer(overrides?: ContainerOverrides): Container {
 		syncHosts,
 		cleanHosts,
 		runCompose,
+		runUp,
 	})
 }
 

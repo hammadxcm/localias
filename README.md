@@ -73,6 +73,7 @@ localias run -- npm run dev
 | `localias proxy start` | Start the reverse proxy on `:1355` |
 | `localias proxy stop` | Stop the running proxy |
 | `localias run -- <cmd>` | Run a dev server with auto-routing |
+| `localias up` | Start all services from `.localiasrc` |
 | `localias compose -- <cmd>` | Route all services from `docker-compose.yml` |
 | `localias list` / `localias ls` | List all active routes |
 | `localias get <name>` | Get the URL for a service |
@@ -243,6 +244,65 @@ Routes are automatically cleaned up when Docker exits or when you press Ctrl+C. 
 | `--name <name>` | Project name override | Inferred from cwd |
 | `--force` | Override conflicting routes | `false` |
 | `--tld <tld>` | Custom top-level domain | `localhost` |
+
+</details>
+
+<details>
+<summary><strong><code>localias up</code></strong> — multi-service config file</summary>
+
+### How it works
+
+Define all your dev services in a `.localiasrc` file and start them with a single command — like `docker-compose up` but for local dev servers.
+
+### Config file format
+
+Create a `.localiasrc` file in your project root:
+
+```json
+{
+  "services": {
+    "portal": { "port": 4042, "command": "yarn run start:portal" },
+    "server": { "port": 3000, "command": "yarn run start:server:dev" },
+    "docs": { "command": "npm run dev:docs" }
+  }
+}
+```
+
+Each service has:
+- `command` (required) — the shell command to run
+- `port` (optional) — fixed port number. If omitted, a free port is allocated automatically
+
+### Basic usage
+
+```bash
+localias up
+# portal → http://portal.localhost:1355 (:4042)
+# server → http://server.localhost:1355 (:3000)
+# docs   → http://docs.localhost:1355   (:5501)
+```
+
+### Crash behavior
+
+When any service exits, all others are terminated. This matches `docker-compose` default behavior — a frontend without its backend is useless.
+
+### Signal handling
+
+Press Ctrl+C to stop all services. SIGINT/SIGTERM are forwarded to all child processes and routes are cleaned up automatically.
+
+### Flags
+
+| Flag | Description | Default |
+|---|---|---|
+| `--force` | Override conflicting routes | `false` |
+| `--tld <tld>` | Custom top-level domain | `localhost` |
+
+### Environment variables injected per service
+
+| Variable | Description | Example |
+|---|---|---|
+| `PORT` | Allocated port number | `4042` |
+| `LOCALIAS_URL` | Full URL of the service | `http://portal.localhost:1355` |
+| `LOCALIAS_HOSTNAME` | Hostname portion | `portal.localhost` |
 
 </details>
 
