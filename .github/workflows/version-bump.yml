@@ -12,21 +12,24 @@ on:
           - minor
           - major
 
+permissions: {}
+
 jobs:
   version-bump:
-    name: Bump ${{ github.event.inputs.type }}
+    name: Bump ${{ inputs.type }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v5
+      # Credentials are intentionally persisted: the last step pushes the bump commit with git.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1 # zizmor: ignore[artipacked]
         with:
           fetch-depth: 0
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v5
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
-          cache: pnpm
+          # No dependency cache: this job pushes to main (cache-poisoning hardening).
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: pnpm test
@@ -34,7 +37,6 @@ jobs:
       - name: Create changeset
         run: |
           mkdir -p .changeset
-          BUMP="${{ github.event.inputs.type }}"
           cat > .changeset/version-bump.md << EOF
           ---
           "localias": ${BUMP}
@@ -45,6 +47,8 @@ jobs:
 
           Version ${BUMP} bump
           EOF
+        env:
+          BUMP: ${{ inputs.type }}
 
       - name: Apply changeset version
         run: pnpm changeset version
@@ -57,4 +61,4 @@ jobs:
           git commit -m "chore: bump version (${BUMP})"
           git push
         env:
-          BUMP: ${{ github.event.inputs.type }}
+          BUMP: ${{ inputs.type }}
