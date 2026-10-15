@@ -19,10 +19,12 @@ export class Hostname {
 
 	static create(input: string, tld = 'localhost'): Result<Hostname, HostnameValidationError> {
 		let cleaned = input.trim().toLowerCase()
-		cleaned = cleaned
-			.replace(/^https?:\/\//, '')
-			.replace(/\/.*$/, '')
-			.replace(/:\d+$/, '')
+		cleaned = cleaned.replace(/^https?:\/\//, '')
+		// Drop any path. indexOf/slice instead of /\/.*$/ avoids polynomial
+		// backtracking on inputs with many '/' characters (CodeQL js/polynomial-redos).
+		const slash = cleaned.indexOf('/')
+		if (slash !== -1) cleaned = cleaned.slice(0, slash)
+		cleaned = cleaned.replace(/:\d+$/, '')
 
 		if (!cleaned) {
 			return err(new HostnameValidationError(input, 'empty hostname'))
